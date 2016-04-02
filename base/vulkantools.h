@@ -99,7 +99,7 @@ namespace vkTools
 		VkBuffer buffer;
 		VkDeviceMemory memory;
 		VkDescriptorBufferInfo descriptor;
-		uint32_t allocSize;
+		VkDeviceSize allocSize;
 	};
 
 	// Destroy (and free) Vulkan resources used by a uniform data structure

@@ -52,7 +52,7 @@ int32_t nextValuePair(std::stringstream *stream)
 {
 	std::string pair;
 	*stream >> pair;
-	uint32_t spos = pair.find("=");
+	size_t spos = pair.find("=");
 	std::string value = pair.substr(spos + 1);
 	int32_t val = std::stoi(value);
 	return val;
@@ -77,7 +77,7 @@ public:
 	} vertices;
 
 	struct {
-		int count;
+		uint32_t count;
 		VkBuffer buf;
 		VkDeviceMemory mem;
 	} indices;
@@ -330,7 +330,7 @@ public:
 		std::vector<uint32_t> indexBuffer;
 		uint32_t indexOffset = 0;
 
-		float w = textures.fontSDF.width;
+		uint32_t w = textures.fontSDF.width;
 
 		float posx = 0.0f;
 		float posy = 0.0f;
@@ -348,10 +348,10 @@ public:
 			float dimy = 1.0f * charh;
 			posy = 1.0f - charh;
 
-			float us = charInfo->x / w;
-			float ue = (charInfo->x + charInfo->width) / w;
-			float ts = charInfo->y / w;
-			float te = (charInfo->y + charInfo->height) / w;
+			float us = (float)charInfo->x / w;
+			float ue = (float)(charInfo->x + charInfo->width) / w;
+			float ts = (float)charInfo->y / w;
+			float te = (float)(charInfo->y + charInfo->height) / w;
 
 			float xo = charInfo->xoffset / 36.0f;
 			float yo = charInfo->yoffset / 36.0f;
@@ -371,7 +371,7 @@ public:
 			float advance = ((float)(charInfo->xadvance) / 36.0f);
 			posx += advance;
 		}
-		indices.count = indexBuffer.size();
+		indices.count = (uint32_t)indexBuffer.size();
 
 		// Center
 		for (auto& v : vertexBuffer)
@@ -424,9 +424,9 @@ public:
 				sizeof(float) * 3);
 
 		vertices.inputState = vkTools::initializers::pipelineVertexInputStateCreateInfo();
-		vertices.inputState.vertexBindingDescriptionCount = vertices.bindingDescriptions.size();
+		vertices.inputState.vertexBindingDescriptionCount = (uint32_t)vertices.bindingDescriptions.size();
 		vertices.inputState.pVertexBindingDescriptions = vertices.bindingDescriptions.data();
-		vertices.inputState.vertexAttributeDescriptionCount = vertices.attributeDescriptions.size();
+		vertices.inputState.vertexAttributeDescriptionCount = (uint32_t)vertices.attributeDescriptions.size();
 		vertices.inputState.pVertexAttributeDescriptions = vertices.attributeDescriptions.data();
 	}
 
@@ -440,7 +440,7 @@ public:
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo = 
 			vkTools::initializers::descriptorPoolCreateInfo(
-				poolSizes.size(),
+				(uint32_t)poolSizes.size(),
 				poolSizes.data(),
 				2);
 
@@ -472,7 +472,7 @@ public:
 		VkDescriptorSetLayoutCreateInfo descriptorLayout = 
 			vkTools::initializers::descriptorSetLayoutCreateInfo(
 				setLayoutBindings.data(),
-				setLayoutBindings.size());
+				(uint32_t)setLayoutBindings.size());
 
 		VkResult err = vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout);
 		assert(!err);
@@ -527,7 +527,7 @@ public:
 				&uniformData.fs.descriptor)
 		};
 
-		vkUpdateDescriptorSets(device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
+		vkUpdateDescriptorSets(device, (uint32_t)writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
 
 		// Default font rendering descriptor set
 		vkRes = vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.bitmap);
@@ -553,7 +553,7 @@ public:
 				&texDescriptor)
 		};
 
-		vkUpdateDescriptorSets(device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
+		vkUpdateDescriptorSets(device, (uint32_t)writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
 	}
 
 	void preparePipelines()
@@ -611,7 +611,7 @@ public:
 		VkPipelineDynamicStateCreateInfo dynamicState =
 			vkTools::initializers::pipelineDynamicStateCreateInfo(
 				dynamicStateEnables.data(),
-				dynamicStateEnables.size(),
+				(uint32_t)dynamicStateEnables.size(),
 				0);
 
 		// Load shaders
@@ -634,7 +634,7 @@ public:
 		pipelineCreateInfo.pViewportState = &viewportState;
 		pipelineCreateInfo.pDepthStencilState = &depthStencilState;
 		pipelineCreateInfo.pDynamicState = &dynamicState;
-		pipelineCreateInfo.stageCount = shaderStages.size();
+		pipelineCreateInfo.stageCount = (uint32_t)shaderStages.size();
 		pipelineCreateInfo.pStages = shaderStages.data();
 
 		VkResult err = vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.sdf);

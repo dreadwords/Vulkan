@@ -280,7 +280,12 @@ namespace vkTools
 		size_t retval;
 		void *shader_code;
 
+#if defined(__ANDROID__) || defined(__linux__)
 		FILE *fp = fopen(filename, "rb");
+#else
+		FILE* fp = 0;
+		fopen_s(&fp, filename, "rb");
+#endif
 		if (!fp) return NULL;
 
 		fseek(fp, 0L, SEEK_END);

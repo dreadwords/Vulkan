@@ -351,7 +351,7 @@ void VulkanExampleBase::renderLoop()
 			std::string windowTitle = getWindowTitle();
 			SetWindowText(window, windowTitle.c_str());
 			fpsTimer = 0.0f;
-			frameCounter = 0.0f;
+			frameCounter = 0;
 		}
 	}
 #elif defined(__ANDROID__)
@@ -555,7 +555,7 @@ VkSubmitInfo VulkanExampleBase::prepareSubmitInfo(
 	submitInfo.pWaitDstStageMask = pipelineStages;
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = &semaphores.presentComplete;
-	submitInfo.commandBufferCount = commandBuffers.size();
+	submitInfo.commandBufferCount = (uint32_t)commandBuffers.size();
 	submitInfo.pCommandBuffers = commandBuffers.data();
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = &semaphores.renderComplete;
@@ -764,7 +764,12 @@ void VulkanExampleBase::setupConsole(std::string title)
 {
 	AllocConsole();
 	AttachConsole(GetCurrentProcessId());
+#if defined(__ANDROID__) || defined(__linux__)
 	freopen("CON", "w", stdout);
+#else
+	FILE* fp = stdout;
+	freopen_s(&fp, "CON", "w", stdout);
+#endif
 	SetConsoleTitle(TEXT(title.c_str()));
 	if (enableValidation)
 	{

@@ -137,7 +137,13 @@ namespace detail
 
 	inline texture load_ktx(char const * Filename)
 	{
+#if defined(__ANDROID__) || defined(__linux__)
 		FILE* File = std::fopen(Filename, "rb");
+#else
+		FILE* File = 0;
+		fopen_s(&File, Filename, "rb");
+#endif
+
 		if(!File)
 			return texture();
 

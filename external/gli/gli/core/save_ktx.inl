@@ -128,9 +128,12 @@ namespace detail
 		if(Texture.empty())
 			return false;
 
+#if defined(__ANDROID__) || defined(__linux__)
 		FILE* File = std::fopen(Filename, "wb");
-		if(!File)
-			return false;
+#else
+		FILE* File = 0;
+		fopen_s(&File, Filename, "wb");
+#endif
 
 		std::vector<char> Memory;
 		bool const Result = save_ktx(Texture, Memory);

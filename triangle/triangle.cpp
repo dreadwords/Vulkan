@@ -47,7 +47,7 @@ public:
 	} vertices;
 
 	struct {
-		int count;
+		uint32_t count;
 		VkBuffer buf;
 		VkDeviceMemory mem;
 	} indices;
@@ -329,12 +329,12 @@ public:
 			{ { -1.0f,  1.0f, 0.0f },{ 0.0f, 1.0f, 0.0f } },
 			{ { 0.0f, -1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
 		};
-		int vertexBufferSize = vertexBuffer.size() * sizeof(Vertex);
+		size_t vertexBufferSize = vertexBuffer.size() * sizeof(Vertex);
 
 		// Setup indices
 		std::vector<uint32_t> indexBuffer = { 0, 1, 2 };
-		uint32_t indexBufferSize = indexBuffer.size() * sizeof(uint32_t);
-		indices.count = indexBuffer.size();
+		uint32_t indexBufferSize = (uint32_t)(indexBuffer.size() * sizeof(uint32_t));
+		indices.count = (uint32_t)indexBuffer.size();
 
 		VkMemoryAllocateInfo memAlloc = {};
 		memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -426,7 +426,7 @@ public:
 			getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex);
 			vkTools::checkResult(vkAllocateMemory(device, &memAlloc, nullptr, &indices.mem));
 			vkTools::checkResult(vkBindBufferMemory(device, indices.buf, indices.mem, 0));
-			indices.count = indexBuffer.size();
+			indices.count = (uint32_t)indexBuffer.size();
 
 			VkCommandBufferBeginInfo cmdBufferBeginInfo = {};
 			cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -516,7 +516,7 @@ public:
 			memcpy(data, indexBuffer.data(), indexBufferSize);
 			vkUnmapMemory(device, indices.mem);
 			vkTools::checkResult(vkBindBufferMemory(device, indices.buf, indices.mem, 0));
-			indices.count = indexBuffer.size();
+			indices.count = (uint32_t)indexBuffer.size();
 		}
 
 		// Binding description
@@ -544,9 +544,9 @@ public:
 		// Assign to vertex buffer
 		vertices.vi.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		vertices.vi.pNext = NULL;
-		vertices.vi.vertexBindingDescriptionCount = vertices.bindingDescriptions.size();
+		vertices.vi.vertexBindingDescriptionCount = (uint32_t)vertices.bindingDescriptions.size();
 		vertices.vi.pVertexBindingDescriptions = vertices.bindingDescriptions.data();
-		vertices.vi.vertexAttributeDescriptionCount = vertices.attributeDescriptions.size();
+		vertices.vi.vertexAttributeDescriptionCount = (uint32_t)vertices.attributeDescriptions.size();
 		vertices.vi.pVertexAttributeDescriptions = vertices.attributeDescriptions.data();
 	}
 
@@ -721,7 +721,7 @@ public:
 		dynamicStateEnables.push_back(VK_DYNAMIC_STATE_SCISSOR);
 		dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		dynamicState.pDynamicStates = dynamicStateEnables.data();
-		dynamicState.dynamicStateCount = dynamicStateEnables.size();
+		dynamicState.dynamicStateCount = (uint32_t)dynamicStateEnables.size();
 
 		// Depth and stencil state
 		// Describes depth and stenctil test and compare ops
@@ -754,7 +754,7 @@ public:
 
 		// Assign states
 		// Assign pipeline state create information
-		pipelineCreateInfo.stageCount = shaderStages.size();
+		pipelineCreateInfo.stageCount = (uint32_t)shaderStages.size();
 		pipelineCreateInfo.pStages = shaderStages.data();
 		pipelineCreateInfo.pVertexInputState = &vertices.vi;
 		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;

@@ -127,7 +127,7 @@ namespace vkMeshLoader
 			vertexInputState = vkTools::initializers::pipelineVertexInputStateCreateInfo();
 			vertexInputState.vertexBindingDescriptionCount = 1;
 			vertexInputState.pVertexBindingDescriptions = &bindingDescription;
-			vertexInputState.vertexAttributeDescriptionCount = attributeDescriptions.size();
+			vertexInputState.vertexAttributeDescriptionCount = (uint32_t)attributeDescriptions.size();
 			vertexInputState.pVertexAttributeDescriptions = attributeDescriptions.data();
 		}
 

@@ -128,8 +128,12 @@ namespace detail
 	{
 		if(Texture.empty())
 			return false;
-
+#if defined(__ANDROID__) || defined(__linux__)
 		FILE* File = std::fopen(Filename, "wb");
+#else
+		FILE* File = 0;
+		fopen_s(&File, Filename, "wb");
+#endif
 		if(!File)
 			return false;
 
