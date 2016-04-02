@@ -518,47 +518,4 @@ static void handleEvent(const xcb_generic_event_t *event)
 }
 #endif
 
-// Main entry point
-#if defined(_WIN32)
-// Windows entry point
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)
-#elif defined(__ANDROID__)
-// Android entry point
-void android_main(android_app* state)
-#elif defined(__linux__)
-// Linux entry point
-int main(const int argc, const char *argv[])
-#endif
-{
-#if defined(__ANDROID__)
-	// Removing this may cause the compiler to omit the main entry point 
-	// which would make the application crash at start
-	app_dummy();
-#elif defined(_WIN32)
-#if defined(DEBUG) || defined(_DEBUG)
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //_CRTDBG_CHECK_ALWAYS_DF)
-#endif
-#endif
-
-	vulkanExample = new VulkanExample();
-#if defined(_WIN32)
-	vulkanExample->setupWindow(hInstance, WndProc);
-#elif defined(__ANDROID__)
-	// Attach vulkan example to global android application state
-	state->userData = vulkanExample;
-	state->onAppCmd = VulkanExample::handleAppCommand;
-	state->onInputEvent = VulkanExample::handleAppInput;
-	vulkanExample->androidApp = state;
-#elif defined(__linux__)
-	vulkanExample->setupWindow();
-#endif
-#if !defined(__ANDROID__)
-	vulkanExample->initSwapchain();
-	vulkanExample->prepare();
-#endif
-	vulkanExample->renderLoop();
-	delete(vulkanExample);
-#if !defined(__ANDROID__)
-	return 0;
-#endif
-}
+DEFINE_VULKAN_APPLICATION_ENTRY_POINT();

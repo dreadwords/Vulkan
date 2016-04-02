@@ -294,3 +294,58 @@ public:
 		VkPipelineStageFlags *pipelineStages);
 };
 
+// ----------- Main entry point
+#if defined(__ANDROID__)
+// Android entry point
+#	define DEFINE_VULKAN_APPLICATION_ENTRY_POINT()														\
+	void android_main(android_app* state)																\
+	{																									\
+		/* Removing this may cause the compiler to omit the main entry point 	*/						\
+		/* which would make the application crash at start						*/						\
+		app_dummy();																					\
+																										\
+		vulkanExample = new VulkanExample();															\
+		/* Attach vulkan example to global android application state			*/						\
+		state->userData = vulkanExample;																\
+		state->onAppCmd = VulkanExample::handleAppCommand;												\
+		state->onInputEvent = VulkanExample::handleAppInput;											\
+		vulkanExample->androidApp = state;																\
+		vulkanExample->renderLoop();																	\
+		delete(vulkanExample);																			\
+	}
+
+#elif defined(__linux__)
+// Linux entry point
+#	define DEFINE_VULKAN_APPLICATION_ENTRY_POINT()														\
+	int main(const int argc, const char *argv[])														\
+	{																									\
+		vulkanExample = new VulkanExample();															\
+		vulkanExample->setupWindow();																	\
+		vulkanExample->initSwapchain();																	\
+		vulkanExample->prepare();																		\
+		vulkanExample->renderLoop();																	\
+		delete(vulkanExample);																			\
+		return 0;																						\
+	}
+
+#elif defined(_WIN32)
+#	if defined(DEBUG) || defined(_DEBUG)
+#		define WIN32_CRT_DEBUG_SET_FLAGS() 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //_CRTDBG_CHECK_ALWAYS_DF)
+#	else
+#		define WIN32_CRT_DEBUG_SET_FLAGS() 	
+#	endif
+// Windows entry point
+#	define DEFINE_VULKAN_APPLICATION_ENTRY_POINT()														\
+	int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)	\
+	{																									\
+		WIN32_CRT_DEBUG_SET_FLAGS()																		\
+		vulkanExample = new VulkanExample();															\
+		vulkanExample->setupWindow(hInstance, WndProc);													\
+		vulkanExample->initSwapchain();																	\
+		vulkanExample->prepare();																		\
+		vulkanExample->renderLoop();																	\
+		delete(vulkanExample);																			\
+		return 0;																						\
+	}
+
+#endif
