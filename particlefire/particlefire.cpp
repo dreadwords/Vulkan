@@ -129,7 +129,7 @@ public:
 		title = "Vulkan Example - Particle system";
 		zoomSpeed *= 1.5f;
 		timerSpeed *= 8.0f;
-		srand(time(NULL));
+		srand((unsigned int)time(NULL));
 	}
 
 	~VulkanExample()
@@ -250,7 +250,7 @@ public:
 
 	float rnd(float range)
 	{
-		return range * (rand() / double(RAND_MAX));
+		return (float)(range * (rand() / double(RAND_MAX)));
 	}
 
 	void initParticle(Particle *particle, glm::vec3 emitterPos)
@@ -260,12 +260,12 @@ public:
 		particle->size = 1.0f + rnd(0.5f);
 		particle->color = glm::vec4(1.0f);
 		particle->type = PARTICLE_TYPE_FLAME;
-		particle->rotation = rnd(2.0f * M_PI);
+		particle->rotation = rnd((float(2.0f * M_PI)));
 		particle->rotationSpeed = rnd(2.0f) - rnd(2.0f);
 
 		// Get random sphere point
-		float theta = rnd(2 * M_PI);
-		float phi = rnd(M_PI) - M_PI / 2;
+		float theta = rnd((float)(2 * M_PI));
+		float phi = (float)(rnd((float)(M_PI)) - M_PI / 2);
 		float r = rnd(FLAME_RADIUS);
 
 		particle->pos.x = r * cos(theta) * cos(phi);
@@ -393,7 +393,7 @@ public:
 		samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
 		samplerCreateInfo.minLod = 0.0f;
 		// Both particle textures have the same number of mip maps
-		samplerCreateInfo.maxLod = textures.particles.fire.mipLevels;
+		samplerCreateInfo.maxLod = (float)textures.particles.fire.mipLevels;
 		// Enable anisotropic filtering
 		samplerCreateInfo.maxAnisotropy = 8;
 		samplerCreateInfo.anisotropyEnable = VK_TRUE;
@@ -465,9 +465,9 @@ public:
 				sizeof(float) * 11));
 
 		particles.inputState = vkTools::initializers::pipelineVertexInputStateCreateInfo();
-		particles.inputState.vertexBindingDescriptionCount = particles.bindingDescriptions.size();
+		particles.inputState.vertexBindingDescriptionCount = (uint32_t)particles.bindingDescriptions.size();
 		particles.inputState.pVertexBindingDescriptions = particles.bindingDescriptions.data();
-		particles.inputState.vertexAttributeDescriptionCount = particles.attributeDescriptions.size();
+		particles.inputState.vertexAttributeDescriptionCount = (uint32_t)particles.attributeDescriptions.size();
 		particles.inputState.pVertexAttributeDescriptions = particles.attributeDescriptions.data();
 	}
 
@@ -482,7 +482,7 @@ public:
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo =
 			vkTools::initializers::descriptorPoolCreateInfo(
-				poolSizes.size(),
+				(uint32_t)poolSizes.size(),
 				poolSizes.data(),
 				2);
 
@@ -514,7 +514,7 @@ public:
 		VkDescriptorSetLayoutCreateInfo descriptorLayout =
 			vkTools::initializers::descriptorSetLayoutCreateInfo(
 				setLayoutBindings.data(),
-				setLayoutBindings.size());
+				(uint32_t)setLayoutBindings.size());
 
 		VkResult err = vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout);
 		assert(!err);
@@ -573,7 +573,7 @@ public:
 				&texDescriptorFire)
 		};
 
-		vkUpdateDescriptorSets(device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
+		vkUpdateDescriptorSets(device, (uint32_t)writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
 
 		// Environment
 		vkRes = vkAllocateDescriptorSets(device, &allocInfo, &meshes.environment.descriptorSet);
@@ -614,7 +614,7 @@ public:
 				2,
 				&texDescriptorNormalMap));
 
-		vkUpdateDescriptorSets(device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
+		vkUpdateDescriptorSets(device, (uint32_t)writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
 	}
 
 	void preparePipelines()
@@ -663,7 +663,7 @@ public:
 		VkPipelineDynamicStateCreateInfo dynamicState =
 			vkTools::initializers::pipelineDynamicStateCreateInfo(
 				dynamicStateEnables.data(),
-				dynamicStateEnables.size(),
+				(uint32_t)dynamicStateEnables.size(),
 				0);
 
 		// Load shaders
@@ -686,7 +686,7 @@ public:
 		pipelineCreateInfo.pViewportState = &viewportState;
 		pipelineCreateInfo.pDepthStencilState = &depthStencilState;
 		pipelineCreateInfo.pDynamicState = &dynamicState;
-		pipelineCreateInfo.stageCount = shaderStages.size();
+		pipelineCreateInfo.stageCount = (uint32_t)shaderStages.size();
 		pipelineCreateInfo.pStages = shaderStages.data();
 
 		depthStencilState.depthWriteEnable = VK_FALSE;
@@ -744,9 +744,9 @@ public:
 	void updateUniformBufferLight()
 	{
 		// Environment
-		uboEnv.lightPos.x = sin(timer * 2 * M_PI) * 1.5f;
+		uboEnv.lightPos.x = (float)(sin(timer * 2 * M_PI) * 1.5f);
 		uboEnv.lightPos.y = 0.0f;
-		uboEnv.lightPos.z = cos(timer * 2 * M_PI) * 1.5f;
+		uboEnv.lightPos.z = (float)(cos(timer * 2 * M_PI) * 1.5f);
 		uint8_t *pData;
 		VkResult err = vkMapMemory(device, uniformData.environment.memory, 0, sizeof(uboEnv), 0, (void **)&pData);
 		assert(!err);

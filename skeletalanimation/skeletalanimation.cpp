@@ -514,20 +514,20 @@ public:
 				vertexBuffer.push_back(vertex);
 			}
 		}
-		uint32_t vertexBufferSize = vertexBuffer.size() * sizeof(Vertex);
+		uint32_t vertexBufferSize = (uint32_t)(vertexBuffer.size() * sizeof(Vertex));
 
 		// Generate index buffer from loaded mesh file
 		std::vector<uint32_t> indexBuffer;
 		for (uint32_t m = 0; m < mesh.meshLoader->m_Entries.size(); m++)
 		{
-			uint32_t indexBase = indexBuffer.size();
+			uint32_t indexBase = (uint32_t)indexBuffer.size();
 			for (uint32_t i = 0; i < mesh.meshLoader->m_Entries[m].Indices.size(); i++)
 			{
 				indexBuffer.push_back(mesh.meshLoader->m_Entries[m].Indices[i] + indexBase);
 			}
 		}
-		uint32_t indexBufferSize = indexBuffer.size() * sizeof(uint32_t);
-		mesh.meshBuffer.indexCount = indexBuffer.size();
+		uint32_t indexBufferSize = (uint32_t)(indexBuffer.size() * sizeof(uint32_t));
+		mesh.meshBuffer.indexCount = (uint32_t)indexBuffer.size();
 
 		// Generate vertex buffer
 		createBuffer(
@@ -611,9 +611,9 @@ public:
 				sizeof(float) * 15);
 
 		vertices.inputState = vkTools::initializers::pipelineVertexInputStateCreateInfo();
-		vertices.inputState.vertexBindingDescriptionCount = vertices.bindingDescriptions.size();
+		vertices.inputState.vertexBindingDescriptionCount = (uint32_t)vertices.bindingDescriptions.size();
 		vertices.inputState.pVertexBindingDescriptions = vertices.bindingDescriptions.data();
-		vertices.inputState.vertexAttributeDescriptionCount = vertices.attributeDescriptions.size();
+		vertices.inputState.vertexAttributeDescriptionCount = (uint32_t)vertices.attributeDescriptions.size();
 		vertices.inputState.pVertexAttributeDescriptions = vertices.attributeDescriptions.data();
 	}
 
@@ -628,7 +628,7 @@ public:
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo =
 			vkTools::initializers::descriptorPoolCreateInfo(
-				poolSizes.size(),
+				(uint32_t)poolSizes.size(),
 				poolSizes.data(),
 				2);
 
@@ -655,7 +655,7 @@ public:
 		VkDescriptorSetLayoutCreateInfo descriptorLayout =
 			vkTools::initializers::descriptorSetLayoutCreateInfo(
 				setLayoutBindings.data(),
-				setLayoutBindings.size());
+				(uint32_t)setLayoutBindings.size());
 
 		VkResult err = vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout);
 		assert(!err);
@@ -702,7 +702,7 @@ public:
 				&texDescriptor)
 		};
 
-		vkUpdateDescriptorSets(device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
+		vkUpdateDescriptorSets(device, (uint32_t)writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
 	}
 
 	void preparePipelines()
@@ -751,7 +751,7 @@ public:
 		VkPipelineDynamicStateCreateInfo dynamicState =
 			vkTools::initializers::pipelineDynamicStateCreateInfo(
 				dynamicStateEnables.data(),
-				dynamicStateEnables.size(),
+				(uint32_t)dynamicStateEnables.size(),
 				0);
 
 		// Solid rendering pipeline
@@ -775,7 +775,7 @@ public:
 		pipelineCreateInfo.pViewportState = &viewportState;
 		pipelineCreateInfo.pDepthStencilState = &depthStencilState;
 		pipelineCreateInfo.pDynamicState = &dynamicState;
-		pipelineCreateInfo.stageCount = shaderStages.size();
+		pipelineCreateInfo.stageCount = (uint32_t)shaderStages.size();
 		pipelineCreateInfo.pStages = shaderStages.data();
 
 		VkResult err = vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid);

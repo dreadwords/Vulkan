@@ -293,9 +293,9 @@ void reBuildCommandBuffers()
 				sizeof(float) * 11);
 
 		vertices.inputState = vkTools::initializers::pipelineVertexInputStateCreateInfo();
-		vertices.inputState.vertexBindingDescriptionCount = vertices.bindingDescriptions.size();
+		vertices.inputState.vertexBindingDescriptionCount = (uint32_t)vertices.bindingDescriptions.size();
 		vertices.inputState.pVertexBindingDescriptions = vertices.bindingDescriptions.data();
-		vertices.inputState.vertexAttributeDescriptionCount = vertices.attributeDescriptions.size();
+		vertices.inputState.vertexAttributeDescriptionCount = (uint32_t)vertices.attributeDescriptions.size();
 		vertices.inputState.pVertexAttributeDescriptions = vertices.attributeDescriptions.data();
 	}
 
@@ -310,7 +310,7 @@ void reBuildCommandBuffers()
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo =
 			vkTools::initializers::descriptorPoolCreateInfo(
-				poolSizes.size(),
+				(uint32_t)poolSizes.size(),
 				poolSizes.data(),
 				4);
 
@@ -347,7 +347,7 @@ void reBuildCommandBuffers()
 		VkDescriptorSetLayoutCreateInfo descriptorLayout =
 			vkTools::initializers::descriptorSetLayoutCreateInfo(
 				setLayoutBindings.data(),
-				setLayoutBindings.size());
+				(uint32_t)setLayoutBindings.size());
 
 		VkResult err = vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout);
 		assert(!err);
@@ -413,7 +413,7 @@ void reBuildCommandBuffers()
 				&uniformData.fragmentShader.descriptor)
 		};
 
-		vkUpdateDescriptorSets(device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
+		vkUpdateDescriptorSets(device, (uint32_t)writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
 	}
 
 	void preparePipelines()
@@ -462,7 +462,7 @@ void reBuildCommandBuffers()
 		VkPipelineDynamicStateCreateInfo dynamicState =
 			vkTools::initializers::pipelineDynamicStateCreateInfo(
 				dynamicStateEnables.data(),
-				dynamicStateEnables.size(),
+				(uint32_t)dynamicStateEnables.size(),
 				0);
 
 		// Parallax mapping pipeline
@@ -485,7 +485,7 @@ void reBuildCommandBuffers()
 		pipelineCreateInfo.pViewportState = &viewportState;
 		pipelineCreateInfo.pDepthStencilState = &depthStencilState;
 		pipelineCreateInfo.pDynamicState = &dynamicState;
-		pipelineCreateInfo.stageCount = shaderStages.size();
+		pipelineCreateInfo.stageCount = (uint32_t)shaderStages.size();
 		pipelineCreateInfo.pStages = shaderStages.data();
 
 		VkResult err = vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.parallaxMapping);
@@ -538,8 +538,8 @@ void reBuildCommandBuffers()
 
 		if (!paused)
 		{
-			ubos.vertexShader.lightPos.x = sin(glm::radians(timer * 360.0f)) * 0.5;
-			ubos.vertexShader.lightPos.y = cos(glm::radians(timer * 360.0f)) * 0.5;
+			ubos.vertexShader.lightPos.x = (float)(sin(glm::radians(timer * 360.0f)) * 0.5);
+			ubos.vertexShader.lightPos.y = (float)(cos(glm::radians(timer * 360.0f)) * 0.5);
 		}
 
 		ubos.vertexShader.cameraPos = glm::vec4(0.0, 0.0, zoom, 0.0);

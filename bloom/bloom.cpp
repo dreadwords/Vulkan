@@ -1326,6 +1326,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 		}
+		else if(uMsg == WM_CLOSE)
+		{
+			DestroyWindow(hWnd);
+			return 0;
+		}
+		else if(uMsg == WM_DESTROY)
+		{
+			PostQuitMessage(0);
+			return 0;
+		}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }

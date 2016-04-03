@@ -339,6 +339,7 @@ public:
 	int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)	\
 	{																									\
 		WIN32_CRT_DEBUG_SET_FLAGS()																		\
+		/*_CrtSetBreakAlloc(1085);*/	\
 		vulkanExample = new VulkanExample();															\
 		vulkanExample->setupWindow(hInstance, WndProc);													\
 		vulkanExample->initSwapchain();																	\

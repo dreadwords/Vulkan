@@ -93,7 +93,7 @@ namespace vkTools
 		void setThreadCount(uint32_t count)
 		{
 			threads.clear();
-			for (auto i = 0; i < count; i++)
+			for (uint32_t i = 0; i < count; i++)
 			{
 				threads.push_back(std::make_unique<Thread>());
 			}

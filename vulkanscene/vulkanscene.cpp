@@ -239,7 +239,7 @@ public:
 		meshList.push_back(demoMeshes.models);
 
 		VkMemoryAllocateInfo memAlloc = vkTools::initializers::memoryAllocateInfo();
-		VkMemoryRequirements memReqs;
+		//VkMemoryRequirements memReqs;
 
 		// todo : Use mesh function for loading
 		float scale = 1.0f;
@@ -278,12 +278,12 @@ public:
 				&mesh->vertexBuffer.buf,
 				&mesh->vertexBuffer.mem);
 
-			uint32_t vertexBufferSize = vertexBuffer.size() * sizeof(Vertex);
+			uint32_t vertexBufferSize = (uint32_t)(vertexBuffer.size() * sizeof(Vertex));
 
 			std::vector<uint32_t> indexBuffer;
 			for (int m = 0; m < mesh->m_Entries.size(); m++)
 			{
-				int indexBase = indexBuffer.size();
+				uint32_t indexBase = (uint32_t)indexBuffer.size();
 				for (int i = 0; i < mesh->m_Entries[m].Indices.size(); i++) {
 					indexBuffer.push_back(mesh->m_Entries[m].Indices[i] + indexBase);
 				}
@@ -294,7 +294,7 @@ public:
 				indexBuffer.data(),
 				&mesh->indexBuffer.buf,
 				&mesh->indexBuffer.mem);
-			mesh->indexBuffer.count = indexBuffer.size();
+			mesh->indexBuffer.count = (uint32_t)indexBuffer.size();
 
 			meshes.push_back(mesh);
 		}
@@ -339,9 +339,9 @@ public:
 				sizeof(float) * 8);
 
 		demoMeshes.inputState = vkTools::initializers::pipelineVertexInputStateCreateInfo();
-		demoMeshes.inputState.vertexBindingDescriptionCount = demoMeshes.bindingDescriptions.size();
+		demoMeshes.inputState.vertexBindingDescriptionCount = (uint32_t)demoMeshes.bindingDescriptions.size();
 		demoMeshes.inputState.pVertexBindingDescriptions = demoMeshes.bindingDescriptions.data();
-		demoMeshes.inputState.vertexAttributeDescriptionCount = demoMeshes.attributeDescriptions.size();
+		demoMeshes.inputState.vertexAttributeDescriptionCount = (uint32_t)demoMeshes.attributeDescriptions.size();
 		demoMeshes.inputState.pVertexAttributeDescriptions = demoMeshes.attributeDescriptions.data();
 	}
 
@@ -356,7 +356,7 @@ public:
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo =
 			vkTools::initializers::descriptorPoolCreateInfo(
-				poolSizes.size(),
+				(uint32_t)poolSizes.size(),
 				poolSizes.data(),
 				2);
 
@@ -383,7 +383,7 @@ public:
 		VkDescriptorSetLayoutCreateInfo descriptorLayout =
 			vkTools::initializers::descriptorSetLayoutCreateInfo(
 				setLayoutBindings.data(),
-				setLayoutBindings.size());
+				(uint32_t)setLayoutBindings.size());
 
 		VkResult err = vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout);
 		assert(!err);
@@ -431,7 +431,7 @@ public:
 				&texDescriptorCubeMap)
 		};
 
-		vkUpdateDescriptorSets(device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
+		vkUpdateDescriptorSets(device, (uint32_t)writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
 	}
 
 	void preparePipelines()
@@ -480,7 +480,7 @@ public:
 		VkPipelineDynamicStateCreateInfo dynamicState =
 			vkTools::initializers::pipelineDynamicStateCreateInfo(
 				dynamicStateEnables.data(),
-				dynamicStateEnables.size(),
+				(uint32_t)dynamicStateEnables.size(),
 				0);
 
 		// Pipeline for the meshes (armadillo, bunny, etc.)
@@ -503,7 +503,7 @@ public:
 		pipelineCreateInfo.pViewportState = &viewportState;
 		pipelineCreateInfo.pDepthStencilState = &depthStencilState;
 		pipelineCreateInfo.pDynamicState = &dynamicState;
-		pipelineCreateInfo.stageCount = shaderStages.size();
+		pipelineCreateInfo.stageCount = (uint32_t)shaderStages.size();
 		pipelineCreateInfo.pStages = shaderStages.data();
 
 		VkResult err = vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.models);

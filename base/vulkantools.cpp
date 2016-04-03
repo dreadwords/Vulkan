@@ -351,7 +351,7 @@ namespace vkTools
 		moduleCreateInfo.flags = 0;
 		err = vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule);
 		assert(!err);
-
+		free(const_cast<char*>(shaderCode));
 		return shaderModule;
 	}
 #endif

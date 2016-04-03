@@ -122,7 +122,7 @@ public:
 #else
 		std::cout << "numThreads = " << numThreads << std::endl;
 #endif
-		srand(time(NULL));
+		srand((unsigned int)time(NULL));
 
 		threadPool.setThreadCount(numThreads);
 
@@ -146,7 +146,7 @@ public:
 
 		for (auto& thread : threadData)
 		{
-			vkFreeCommandBuffers(device, thread.commandPool, thread.commandBuffer.size(), thread.commandBuffer.data());
+			vkFreeCommandBuffers(device, thread.commandPool, (uint32_t)thread.commandBuffer.size(), thread.commandBuffer.data());
 			vkDestroyCommandPool(device, thread.commandPool, nullptr);
 			vkMeshLoader::freeMeshBufferResources(device, &thread.mesh);
 		}
@@ -154,7 +154,7 @@ public:
 
 	float rnd(float range)
 	{
-		return range * (rand() / double(RAND_MAX));
+		return (float)(range * (rand() / double(RAND_MAX)));
 	}
 
 	// Create all threads and initialize shader push constants
@@ -180,7 +180,7 @@ public:
 
 		createSetupCommandBuffer();
 
-		float maxX = std::floor(std::sqrt(numThreads * numObjectsPerThread));
+		float maxX = (float)(std::floor(std::sqrt(numThreads * numObjectsPerThread)));
 		uint32_t posX = 0;
 		uint32_t posZ = 0;
 
@@ -201,7 +201,7 @@ public:
 				vkTools::initializers::commandBufferAllocateInfo(
 					thread->commandPool,
 					VK_COMMAND_BUFFER_LEVEL_SECONDARY,
-					thread->commandBuffer.size());
+					(uint32_t)thread->commandBuffer.size());
 			vkTools::checkResult(vkAllocateCommandBuffers(device, &secondaryCmdBufAllocateInfo, thread->commandBuffer.data()));
 
 			// Unique vertex and index buffers per thread
@@ -252,11 +252,11 @@ public:
 				thread->objectData[j].pos.x = (posX - maxX / 2.0f) * 3.0f + rnd(1.5f) - rnd(1.5f);
 				thread->objectData[j].pos.z = (posZ - maxX / 2.0f) * 3.0f + rnd(1.5f) - rnd(1.5f);
 
-				posX += 1.0f;
+				posX += 1;
 				if (posX >= maxX)
 				{
-					posX = 0.0f;
-					posZ += 1.0f;
+					posX = 0;
+					posZ += 1;
 				}
 
 				thread->objectData[j].rotation = glm::vec3(0.0f, rnd(360.0f), 0.0f);
@@ -430,7 +430,7 @@ public:
 		threadPool.wait();
 
 		// Execute render commands from the secondary command buffer
-		vkCmdExecuteCommands(primaryCommandBuffer, commandBuffers.size(), commandBuffers.data());
+		vkCmdExecuteCommands(primaryCommandBuffer, (uint32_t)commandBuffers.size(), commandBuffers.data());
 
 		vkCmdEndRenderPass(primaryCommandBuffer);
 
@@ -517,9 +517,9 @@ public:
 				sizeof(float) * 6);
 
 		vertices.inputState = vkTools::initializers::pipelineVertexInputStateCreateInfo();
-		vertices.inputState.vertexBindingDescriptionCount = vertices.bindingDescriptions.size();
+		vertices.inputState.vertexBindingDescriptionCount = (uint32_t)vertices.bindingDescriptions.size();
 		vertices.inputState.pVertexBindingDescriptions = vertices.bindingDescriptions.data();
-		vertices.inputState.vertexAttributeDescriptionCount = vertices.attributeDescriptions.size();
+		vertices.inputState.vertexAttributeDescriptionCount = (uint32_t)vertices.attributeDescriptions.size();
 		vertices.inputState.pVertexAttributeDescriptions = vertices.attributeDescriptions.data();
 	}
 
@@ -588,7 +588,7 @@ public:
 		VkPipelineDynamicStateCreateInfo dynamicState =
 			vkTools::initializers::pipelineDynamicStateCreateInfo(
 				dynamicStateEnables.data(),
-				dynamicStateEnables.size(),
+				(uint32_t)dynamicStateEnables.size(),
 				0);
 
 		// Solid rendering pipeline
@@ -612,7 +612,7 @@ public:
 		pipelineCreateInfo.pViewportState = &viewportState;
 		pipelineCreateInfo.pDepthStencilState = &depthStencilState;
 		pipelineCreateInfo.pDynamicState = &dynamicState;
-		pipelineCreateInfo.stageCount = shaderStages.size();
+		pipelineCreateInfo.stageCount = (uint32_t)shaderStages.size();
 		pipelineCreateInfo.pStages = shaderStages.data();
 
 		vkTools::checkResult(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.phong));

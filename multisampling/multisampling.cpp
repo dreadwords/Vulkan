@@ -288,7 +288,7 @@ public:
 		subpass.pDepthStencilAttachment = &depthReference;
 
 		VkRenderPassCreateInfo renderPassInfo = vkTools::initializers::renderPassCreateInfo();
-		renderPassInfo.attachmentCount = attachments.size();
+		renderPassInfo.attachmentCount = (uint32_t)attachments.size();
 		renderPassInfo.pAttachments = attachments.data();
 		renderPassInfo.subpassCount = 1;
 		renderPassInfo.pSubpasses = &subpass;
@@ -316,7 +316,7 @@ public:
 		frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		frameBufferCreateInfo.pNext = NULL;
 		frameBufferCreateInfo.renderPass = renderPass;
-		frameBufferCreateInfo.attachmentCount = attachments.size();
+		frameBufferCreateInfo.attachmentCount = (uint32_t)attachments.size();
 		frameBufferCreateInfo.pAttachments = attachments.data();
 		frameBufferCreateInfo.width = width;
 		frameBufferCreateInfo.height = height;
@@ -477,9 +477,9 @@ public:
 				sizeof(float) * 8);
 
 		vertices.inputState = vkTools::initializers::pipelineVertexInputStateCreateInfo();
-		vertices.inputState.vertexBindingDescriptionCount = vertices.bindingDescriptions.size();
+		vertices.inputState.vertexBindingDescriptionCount = (uint32_t)vertices.bindingDescriptions.size();
 		vertices.inputState.pVertexBindingDescriptions = vertices.bindingDescriptions.data();
-		vertices.inputState.vertexAttributeDescriptionCount = vertices.attributeDescriptions.size();
+		vertices.inputState.vertexAttributeDescriptionCount = (uint32_t)vertices.attributeDescriptions.size();
 		vertices.inputState.pVertexAttributeDescriptions = vertices.attributeDescriptions.data();
 	}
 
@@ -494,7 +494,7 @@ public:
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo =
 			vkTools::initializers::descriptorPoolCreateInfo(
-				poolSizes.size(),
+				(uint32_t)poolSizes.size(),
 				poolSizes.data(),
 				2);
 
@@ -520,7 +520,7 @@ public:
 		VkDescriptorSetLayoutCreateInfo descriptorLayout =
 			vkTools::initializers::descriptorSetLayoutCreateInfo(
 				setLayoutBindings.data(),
-				setLayoutBindings.size());
+				(uint32_t)setLayoutBindings.size());
 
 		vkTools::checkResult(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
@@ -564,7 +564,7 @@ public:
 				&texDescriptor)
 		};
 
-		vkUpdateDescriptorSets(device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
+		vkUpdateDescriptorSets(device, (uint32_t)writeDescriptorSets.size(), writeDescriptorSets.data(), 0, NULL);
 	}
 
 	void preparePipelines()
@@ -613,7 +613,7 @@ public:
 		VkPipelineDynamicStateCreateInfo dynamicState =
 			vkTools::initializers::pipelineDynamicStateCreateInfo(
 				dynamicStateEnables.data(),
-				dynamicStateEnables.size(),
+				(uint32_t)dynamicStateEnables.size(),
 				0);
 
 		// Solid rendering pipeline
@@ -637,7 +637,7 @@ public:
 		pipelineCreateInfo.pViewportState = &viewportState;
 		pipelineCreateInfo.pDepthStencilState = &depthStencilState;
 		pipelineCreateInfo.pDynamicState = &dynamicState;
-		pipelineCreateInfo.stageCount = shaderStages.size();
+		pipelineCreateInfo.stageCount = (uint32_t)shaderStages.size();
 		pipelineCreateInfo.pStages = shaderStages.data();
 
 		vkTools::checkResult(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
