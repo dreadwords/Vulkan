@@ -97,9 +97,9 @@ void VulkanGear::generate(float inner_radius, float outer_radius, float width, i
 
 		// front face
 		normal = glm::vec3(0.0, 0.0, 1.0);
-		ix0 = newVertex(&vBuffer, (float)(r0 * cos_ta), (float)(r0 * sin_ta), (float)(width * 0.5), normal);
-		ix1 = newVertex(&vBuffer, (float)(r1 * cos_ta), (float)(r1 * sin_ta), (float)(width * 0.5), normal);
-		ix2 = newVertex(&vBuffer, (float)(r0 * cos_ta), (float)(r0 * sin_ta), (float)(width * 0.5), normal);
+		ix0 = newVertex(&vBuffer, (float)(r0 * cos_ta),		(float)(r0 * sin_ta),	  (float)(width * 0.5), normal);
+		ix1 = newVertex(&vBuffer, (float)(r1 * cos_ta),		(float)(r1 * sin_ta),	  (float)(width * 0.5), normal);
+		ix2 = newVertex(&vBuffer, (float)(r0 * cos_ta),		(float)(r0 * sin_ta),	  (float)(width * 0.5), normal);
 		ix3 = newVertex(&vBuffer, (float)(r1 * cos_ta_3da), (float)(r1 * sin_ta_3da), (float)(width * 0.5), normal);
 		ix4 = newVertex(&vBuffer, (float)(r0 * cos_ta_4da), (float)(r0 * sin_ta_4da), (float)(width * 0.5), normal);
 		ix5 = newVertex(&vBuffer, (float)(r1 * cos_ta_4da), (float)(r1 * sin_ta_4da), (float)(width * 0.5), normal);
@@ -110,7 +110,7 @@ void VulkanGear::generate(float inner_radius, float outer_radius, float width, i
 
 		// front sides of teeth
 		normal = glm::vec3(0.0, 0.0, 1.0);
-		ix0 = newVertex(&vBuffer, (float)(r1 * cos_ta), (float)(r1 * sin_ta), (float)(width * 0.5), normal);
+		ix0 = newVertex(&vBuffer, (float)(r1 * cos_ta),		(float)(r1 * sin_ta),	  (float)(width * 0.5), normal);
 		ix1 = newVertex(&vBuffer, (float)(r2 * cos_ta_1da), (float)(r2 * sin_ta_1da), (float)(width * 0.5), normal);
 		ix2 = newVertex(&vBuffer, (float)(r1 * cos_ta_3da), (float)(r1 * sin_ta_3da), (float)(width * 0.5), normal);
 		ix3 = newVertex(&vBuffer, (float)(r2 * cos_ta_2da), (float)(r2 * sin_ta_2da), (float)(width * 0.5), normal);
@@ -119,12 +119,12 @@ void VulkanGear::generate(float inner_radius, float outer_radius, float width, i
 
 		// back face 
 		normal = glm::vec3(0.0, 0.0, -1.0);
-		ix0 = newVertex(&vBuffer, (float)(r1 * cos_ta), (float)(r1 * sin_ta), -(float)(width * 0.5), normal);
-		ix1 = newVertex(&vBuffer, (float)(r0 * cos_ta), (float)(r0 * sin_ta), -(float)(width * 0.5), normal);
-		ix2 = newVertex(&vBuffer, (float)(r1 * cos_ta_3da), (float)(r1 * sin_ta_3da), -(float)(width * 0.5), normal);
-		ix3 = newVertex(&vBuffer, (float)(r0 * cos_ta), (float)(r0 * sin_ta), -(float)(width * 0.5), normal);
-		ix4 = newVertex(&vBuffer, (float)(r1 * cos_ta_4da), (float)(r1 * sin_ta_4da), -(float)(width * 0.5), normal);
-		ix5 = newVertex(&vBuffer, (float)(r0 * cos_ta_4da), (float)(r0 * sin_ta_4da), -(float)(width * 0.5), normal);
+		ix0 = newVertex(&vBuffer, (float)(r1 * cos_ta),		(float)(r1 * sin_ta),	  (float)(-width * 0.5), normal);
+		ix1 = newVertex(&vBuffer, (float)(r0 * cos_ta),		(float)(r0 * sin_ta),	  (float)(-width * 0.5), normal);
+		ix2 = newVertex(&vBuffer, (float)(r1 * cos_ta_3da), (float)(r1 * sin_ta_3da), (float)(-width * 0.5), normal);
+		ix3 = newVertex(&vBuffer, (float)(r0 * cos_ta),		(float)(r0 * sin_ta),	  (float)(-width * 0.5), normal);
+		ix4 = newVertex(&vBuffer, (float)(r1 * cos_ta_4da), (float)(r1 * sin_ta_4da), (float)(-width * 0.5), normal);
+		ix5 = newVertex(&vBuffer, (float)(r0 * cos_ta_4da), (float)(r0 * sin_ta_4da), (float)(-width * 0.5), normal);
 		newFace(&iBuffer, ix0, ix1, ix2);
 		newFace(&iBuffer, ix1, ix3, ix2);
 		newFace(&iBuffer, ix2, ix3, ix4);
@@ -134,15 +134,15 @@ void VulkanGear::generate(float inner_radius, float outer_radius, float width, i
 		normal = glm::vec3(0.0, 0.0, -1.0);
 		ix0 = newVertex(&vBuffer, (float)(r1 * cos_ta_3da), (float)(r1 * sin_ta_3da), (float)(-width * 0.5), normal);
 		ix1 = newVertex(&vBuffer, (float)(r2 * cos_ta_2da), (float)(r2 * sin_ta_2da), (float)(-width * 0.5), normal);
-		ix2 = newVertex(&vBuffer, (float)(r1 * cos_ta	 ), (float)(r1 * sin_ta	   ), (float)(-width * 0.5), normal);
+		ix2 = newVertex(&vBuffer, (float)(r1 * cos_ta),		(float)(r1 * sin_ta),	  (float)(-width * 0.5), normal);
 		ix3 = newVertex(&vBuffer, (float)(r2 * cos_ta_1da), (float)(r2 * sin_ta_1da), (float)(-width * 0.5), normal);
 		newFace(&iBuffer, ix0, ix1, ix2);
 		newFace(&iBuffer, ix1, ix3, ix2);
 
 		// draw outward faces of teeth 
 		normal = glm::vec3(v1, -u1, 0.0);
-		ix0 = newVertex(&vBuffer, (float)(r1 * cos_ta	 ), (float)(r1 * sin_ta	   ), (float)(width * 0.5 ), normal);
-		ix1 = newVertex(&vBuffer, (float)(r1 * cos_ta	 ), (float)(r1 * sin_ta	   ), (float)(-width * 0.5), normal);
+		ix0 = newVertex(&vBuffer, (float)(r1 * cos_ta),		(float)(r1 * sin_ta),	  (float)(width * 0.5 ), normal);
+		ix1 = newVertex(&vBuffer, (float)(r1 * cos_ta),		(float)(r1 * sin_ta),	  (float)(-width * 0.5), normal);
 		ix2 = newVertex(&vBuffer, (float)(r2 * cos_ta_1da), (float)(r2 * sin_ta_1da), (float)(width * 0.5 ), normal);
 		ix3 = newVertex(&vBuffer, (float)(r2 * cos_ta_1da), (float)(r2 * sin_ta_1da), (float)(-width * 0.5), normal);
 		newFace(&iBuffer, ix0, ix1, ix2);
