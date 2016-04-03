@@ -14,6 +14,7 @@
     <ClCompile Include="multithreading.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\base\frustum.hpp" />
     <ClInclude Include="..\base\threadpool.hpp" />
   </ItemGroup>
   <ItemGroup>
