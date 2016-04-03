@@ -338,8 +338,8 @@ public:
 #	define DEFINE_VULKAN_APPLICATION_ENTRY_POINT()														\
 	int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)	\
 	{																									\
+		/*_CrtSetBreakAlloc(141);*/																		\
 		WIN32_CRT_DEBUG_SET_FLAGS()																		\
-		/*_CrtSetBreakAlloc(1085);*/	\
 		vulkanExample = new VulkanExample();															\
 		vulkanExample->setupWindow(hInstance, WndProc);													\
 		vulkanExample->initSwapchain();																	\

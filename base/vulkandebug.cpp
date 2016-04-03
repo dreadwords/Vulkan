@@ -78,12 +78,12 @@ namespace vkDebug
 		dbgCreateInfo.pfnCallback = (PFN_vkDebugReportCallbackEXT)messageCallback;
 		dbgCreateInfo.pUserData = NULL;
 		dbgCreateInfo.flags = flags;
-		VkDebugReportCallbackEXT debugReportCallback;
+		//VkDebugReportCallbackEXT debugReportCallback;
 		VkResult err = CreateDebugReportCallback(
 			instance,
 			&dbgCreateInfo,
 			NULL,
-			&debugReportCallback);
+			&msgCallback); //&debugReportCallback);
 		assert(!err);
 
 
