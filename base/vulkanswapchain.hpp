@@ -8,6 +8,8 @@
 *
 * This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 */
+#ifndef __VULKANSWAPCHAIN_HPP__
+#define __VULKANSWAPCHAIN_HPP__
 
 #pragma once
 
@@ -258,7 +260,7 @@ public:
 
 		VkExtent2D swapchainExtent = {};
 		// width and height are either both -1, or both not -1.
-		if (surfCaps.currentExtent.width == -1)
+		if (surfCaps.currentExtent.width == ~uint32_t(0)) // -1)
 		{
 			// If the surface size is undefined, the size is set to
 			// the size of the images requested.
@@ -429,3 +431,5 @@ public:
 	}
 
 };
+
+#endif // __VULKANSWAPCHAIN_HPP__
