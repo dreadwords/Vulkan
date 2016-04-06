@@ -766,12 +766,8 @@ void VulkanExampleBase::setupConsole(std::string title)
 {
 	AllocConsole();
 	AttachConsole(GetCurrentProcessId());
-#if defined(__ANDROID__) || defined(__linux__)
-	freopen("CON", "w", stdout);
-#else
 	FILE* fp = stdout;
 	freopen_s(&fp, "CON", "w", stdout);
-#endif
 	SetConsoleTitle(TEXT(title.c_str()));
 	if (enableValidation)
 	{
