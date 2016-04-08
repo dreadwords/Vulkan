@@ -1294,6 +1294,16 @@ public:
 		reBuildCommandBuffers();
 		updateUniformBuffersScreen();
 	}
+
+	virtual void keyPressed(uint32_t keyCode)
+	{
+		switch (keyCode)
+		{
+		case 'D'://0x44:
+			toggleDebugDisplay();
+			break;
+		}
+	}
 };
 
 VulkanExample *vulkanExample;
@@ -1304,15 +1314,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		if (uMsg == WM_KEYDOWN)
-		{
-			switch (wParam)
-			{
-			case 0x44:
-				vulkanExample->toggleDebugDisplay();
-				break;
-			}
-		}
+		//if (uMsg == WM_KEYDOWN)
+		//{
+		//	switch (wParam)
+		//	{
+		//	case 0x44:
+		//		vulkanExample->toggleDebugDisplay();
+		//		break;
+		//	}
+		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }

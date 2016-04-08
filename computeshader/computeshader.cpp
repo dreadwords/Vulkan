@@ -839,6 +839,17 @@ public:
 			buildComputeCommandBuffer();
 		}
 	}
+
+	virtual void keyPressed(uint32_t keyCode)
+	{
+		switch (keyCode)
+		{
+		case VK_ADD:
+		case VK_SUBTRACT:
+			switchComputePipeline((keyCode == VK_ADD) ? 1 : -1);
+			break;
+		}
+	}
 };
 
 VulkanExample *vulkanExample;
@@ -849,13 +860,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		switch (wParam)
-		{
-		case VK_ADD:
-		case VK_SUBTRACT:
-			vulkanExample->switchComputePipeline((wParam == VK_ADD) ? 1 : -1);
-			break;
-		}
+		//switch (wParam)
+		//{
+		//case VK_ADD:
+		//case VK_SUBTRACT:
+		//	vulkanExample->switchComputePipeline((wParam == VK_ADD) ? 1 : -1);
+		//	break;
+		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }

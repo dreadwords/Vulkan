@@ -746,6 +746,19 @@ public:
 		updateFontSettings();
 	}
 
+	virtual void keyPressed(uint32_t keyCode)
+	{
+		switch (keyCode)
+		{
+		case 'S'://0x53:
+			toggleSplitScreen();
+			break;
+		case 'O'://0x4F:
+			toggleFontOutline();
+			break;
+		}
+	}
+
 };
 
 VulkanExample *vulkanExample;
@@ -756,18 +769,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		if (uMsg == WM_KEYDOWN)
-		{
-			switch (wParam)
-			{
-			case 0x53:
-				vulkanExample->toggleSplitScreen();
-				break;
-			case 0x4F:
-				vulkanExample->toggleFontOutline();
-				break;
-			}
-		}
+		//if (uMsg == WM_KEYDOWN)
+		//{
+		//	switch (wParam)
+		//	{
+		//	case 0x53:
+		//		vulkanExample->toggleSplitScreen();
+		//		break;
+		//	case 0x4F:
+		//		vulkanExample->toggleFontOutline();
+		//		break;
+		//	}
+		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }

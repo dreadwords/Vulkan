@@ -109,10 +109,10 @@ public:
 
 		textureLoader->destroyTexture(textures.skybox);
 
-		delete(demoMeshes.logos		);
+		delete(demoMeshes.logos);
 		delete(demoMeshes.background);
-		delete(demoMeshes.models	);
-		delete(demoMeshes.skybox	);
+		delete(demoMeshes.models);
+		delete(demoMeshes.skybox);
 	}
 
 	void loadTextures()

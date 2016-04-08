@@ -1075,6 +1075,18 @@ public:
 		reBuildCommandBuffers();
 	}
 
+	virtual void keyPressed(uint32_t keyCode)
+	{
+		switch (keyCode)
+		{
+		case 'B'://0x42:
+			toggleBlur();
+			break;
+		case 'T'://0x54:
+			toggleTextureDisplay();
+			break;
+		}
+	}
 };
 
 VulkanExample *vulkanExample;
@@ -1085,18 +1097,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		if (uMsg == WM_KEYDOWN)
-		{
-			switch (wParam)
-			{
-			case 0x42:
-				vulkanExample->toggleBlur();
-				break;
-			case 0x54:
-				vulkanExample->toggleTextureDisplay();
-				break;
-			}
-		}
+		//if (uMsg == WM_KEYDOWN)
+		//{
+		//	switch (wParam)
+		//	{
+		//	case 0x42:
+		//		vulkanExample->toggleBlur();
+		//		break;
+		//	case 0x54:
+		//		vulkanExample->toggleTextureDisplay();
+		//		break;
+		//	}
+		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }

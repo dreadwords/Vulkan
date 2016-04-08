@@ -592,6 +592,24 @@ public:
 		reBuildCommandBuffers();
 	}
 
+	virtual void keyPressed(uint32_t keyCode)
+	{
+		switch (keyCode)
+		{
+		case VK_ADD:
+			changeTessellationLevel(0.25);
+			break;
+		case VK_SUBTRACT:
+			changeTessellationLevel(-0.25);
+			break;
+		case 'W'://0x57:
+			togglePipelines();
+			break;
+		case 'S'://0x53:
+			toggleSplitScreen();
+			break;
+		}
+	}
 };
 
 VulkanExample *vulkanExample;
@@ -602,24 +620,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		if (uMsg == WM_KEYDOWN)
-		{
-			switch (wParam)
-			{
-			case VK_ADD:
-				vulkanExample->changeTessellationLevel(0.25);
-				break;
-			case VK_SUBTRACT:
-				vulkanExample->changeTessellationLevel(-0.25);
-				break;
-			case 0x57:
-				vulkanExample->togglePipelines();
-				break;
-			case 0x53:
-				vulkanExample->toggleSplitScreen();
-				break;
-			}
-		}
+		//if (uMsg == WM_KEYDOWN)
+		//{
+		//	switch (wParam)
+		//	{
+		//	case VK_ADD:
+		//		vulkanExample->changeTessellationLevel(0.25);
+		//		break;
+		//	case VK_SUBTRACT:
+		//		vulkanExample->changeTessellationLevel(-0.25);
+		//		break;
+		//	case 0x57:
+		//		vulkanExample->togglePipelines();
+		//		break;
+		//	case 0x53:
+		//		vulkanExample->toggleSplitScreen();
+		//		break;
+		//	}
+		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }

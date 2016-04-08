@@ -892,6 +892,19 @@ public:
 		}
 		updateUniformBuffers();
 	}
+
+	virtual void keyPressed(uint32_t keyCode)
+	{
+		switch (keyCode)
+		{
+		case VK_ADD:
+			changeLodBias(0.1f);
+			break;
+		case VK_SUBTRACT:
+			changeLodBias(-0.1f);
+			break;
+		}
+	}
 };
 
 VulkanExample *vulkanExample;
@@ -902,18 +915,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		if (uMsg == WM_KEYDOWN)
-		{
-			switch (wParam)
-			{
-			case VK_ADD:
-				vulkanExample->changeLodBias(0.1f);
-				break;
-			case VK_SUBTRACT:
-				vulkanExample->changeLodBias(-0.1f);
-				break;
-			}
-		}
+		//if (uMsg == WM_KEYDOWN)
+		//{
+		//	switch (wParam)
+		//	{
+		//	case VK_ADD:
+		//		vulkanExample->changeLodBias(0.1f);
+		//		break;
+		//	case VK_SUBTRACT:
+		//		vulkanExample->changeLodBias(-0.1f);
+		//		break;
+		//	}
+		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }

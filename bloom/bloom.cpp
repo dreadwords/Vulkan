@@ -1301,6 +1301,22 @@ public:
 		bloom = !bloom;
 		reBuildCommandBuffers();
 	}
+
+	virtual void keyPressed(uint32_t keyCode)
+	{
+		switch (keyCode)
+		{
+		case 'B'://0x42
+			toggleBloom();
+			break;
+		case VK_ADD:
+			changeBlurScale(0.25f);
+			break;
+		case VK_SUBTRACT:
+			changeBlurScale(-0.25f);
+			break;
+		}
+	}
 };
 
 VulkanExample *vulkanExample;
@@ -1311,31 +1327,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		if (uMsg == WM_KEYDOWN)
-		{
-			switch (wParam)
-			{
-			case 0x42:
-				vulkanExample->toggleBloom();
-				break;
-			case VK_ADD:
-				vulkanExample->changeBlurScale(0.25f);
-				break;
-			case VK_SUBTRACT:
-				vulkanExample->changeBlurScale(-0.25f);
-				break;
-			}
-		}
-		else if(uMsg == WM_CLOSE)
-		{
-			DestroyWindow(hWnd);
-			return 0;
-		}
-		else if(uMsg == WM_DESTROY)
-		{
-			PostQuitMessage(0);
-			return 0;
-		}
+		//if (uMsg == WM_KEYDOWN)
+		//{
+		//	switch (wParam)
+		//	{
+		//	case 0x42:
+		//		vulkanExample->toggleBloom();
+		//		break;
+		//	case VK_ADD:
+		//		vulkanExample->changeBlurScale(0.25f);
+		//		break;
+		//	case VK_SUBTRACT:
+		//		vulkanExample->changeBlurScale(-0.25f);
+		//		break;
+		//	}
+		//}
+		//else if(uMsg == WM_CLOSE)
+		//{
+		//	DestroyWindow(hWnd);
+		//	return 0;
+		//}
+		//else if(uMsg == WM_DESTROY)
+		//{
+		//	PostQuitMessage(0);
+		//	return 0;
+		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }

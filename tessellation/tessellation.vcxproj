@@ -88,15 +88,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="tessellation.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\vulkanBase\vulkanMemory.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\base\vulkanexamplebase.vcxproj">
       <Project>{3977789c-b360-4e1b-a100-3d71a1567723}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="tessellation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

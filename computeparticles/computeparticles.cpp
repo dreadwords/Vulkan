@@ -742,6 +742,16 @@ public:
 	{
 		animate = !animate;
 	}
+	
+	virtual void keyPressed(uint32_t keyCode)
+	{
+		switch (keyCode)
+		{
+		case 'A': //0x41
+			toggleAnimation();
+			break;
+		}
+	}
 };
 
 VulkanExample *vulkanExample;
@@ -752,15 +762,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		if (uMsg == WM_KEYDOWN)
-		{
-			switch (wParam)
-			{
-			case 0x41:
-				vulkanExample->toggleAnimation();
-				break;
-			}
-		}
+		//if (uMsg == WM_KEYDOWN)
+		//{
+		//	switch (wParam)
+		//	{
+		//	case 0x41:
+		//		vulkanExample->toggleAnimation();
+		//		break;
+		//	}
+		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }
