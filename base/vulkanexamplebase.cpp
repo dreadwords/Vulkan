@@ -18,7 +18,7 @@ VkResult VulkanExampleBase::createInstance(bool enableValidation)
 	appInfo.pEngineName = name.c_str();
 	// Temporary workaround for drivers not supporting SDK 1.0.3 upon launch
 	// todo : Use VK_API_VERSION
-	appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 2);
+	appInfo.apiVersion = VK_API_VERSION;//VK_MAKE_VERSION(1, 0, 2);
 
 	std::vector<const char*> enabledExtensions = { VK_KHR_SURFACE_EXTENSION_NAME };
 
@@ -591,7 +591,7 @@ VulkanExampleBase::VulkanExampleBase(bool enableValidation)
 #if defined(_WIN32)
 	// Enable console if validation is active
 	// Debug message callback will output to it
-	if (enableValidation)
+	if (true)// (enableValidation)
 	{
 		setupConsole("VulkanExample");
 	}
