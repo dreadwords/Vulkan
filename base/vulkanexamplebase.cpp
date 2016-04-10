@@ -19,7 +19,7 @@ VkResult VulkanExampleBase::createInstance(bool enableValidation)
 
 	// Temporary workaround for drivers not supporting SDK 1.0.3 upon launch
 	// todo : Use VK_API_VERSION
-	appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 5); //VK_VERSION_1_0
+	appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 8); //VK_VERSION_1_0
 
 	std::vector<const char*> enabledExtensions = { VK_KHR_SURFACE_EXTENSION_NAME };
 
