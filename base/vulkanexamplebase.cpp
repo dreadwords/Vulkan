@@ -904,17 +904,17 @@ HWND VulkanExampleBase::setupWindow(HINSTANCE hinstance, WNDPROC wndproc)
 	return window;
 }
 
-void VulkanExampleBase::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT VulkanExampleBase::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
 	case WM_CLOSE:
 		prepared = false;
 		DestroyWindow(hWnd);
-		break;
+		return 0;//break
 	case WM_DESTROY:
 		PostQuitMessage(0);
-		break;
+		return 0;//break
 	case WM_PAINT:
 		ValidateRect(window, NULL);
 		break;
@@ -990,6 +990,7 @@ void VulkanExampleBase::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		}
 		break;
 	}
+	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 #elif defined(__ANDROID__)
 int32_t VulkanExampleBase::handleAppInput(struct android_app* app, AInputEvent* event)

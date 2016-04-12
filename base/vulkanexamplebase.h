@@ -197,7 +197,7 @@ public:
 #if defined(_WIN32)
 	void setupConsole(std::string title);
 	HWND setupWindow(HINSTANCE hinstance, WNDPROC wndproc);
-	void handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #elif defined(__ANDROID__)
 	static int32_t handleAppInput(struct android_app* app, AInputEvent* event);
 	static void handleAppCommand(android_app* app, int32_t cmd);
@@ -310,6 +310,8 @@ public:
 #if defined(__ANDROID__)
 // Android entry point
 #	define DEFINE_VULKAN_APPLICATION_ENTRY_POINT()														\
+	VulkanExample *vulkanExample;																		\
+																										\
 	void android_main(android_app* state)																\
 	{																									\
 		/* Removing this may cause the compiler to omit the main entry point 	*/						\
@@ -329,6 +331,15 @@ public:
 #elif defined(__linux__)
 // Linux entry point
 #	define DEFINE_VULKAN_APPLICATION_ENTRY_POINT()														\
+	VulkanExample *vulkanExample;																		\
+																										\
+	static void handleEvent(const xcb_generic_event_t *event)											\
+	{																									\
+		if (vulkanExample != NULL)																		\
+		{																								\
+			vulkanExample->handleEvent(event);															\
+		}																								\
+	}																									\
 	int main(const int argc, const char *argv[])														\
 	{																									\
 		vulkanExample = new VulkanExample();															\
@@ -348,6 +359,16 @@ public:
 #	endif
 // Windows entry point
 #	define DEFINE_VULKAN_APPLICATION_ENTRY_POINT()														\
+	VulkanExample *vulkanExample;																		\
+																										\
+	LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)						\
+	{																									\
+		if (vulkanExample != NULL)																		\
+		{																								\
+			return vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);							\
+		}																								\
+		return (DefWindowProc(hWnd, uMsg, wParam, lParam));												\
+	}																									\
 	int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)	\
 	{																									\
 		/*_CrtSetBreakAlloc(141);*/																		\
