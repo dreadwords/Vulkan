@@ -618,10 +618,10 @@ public:
 	{
 		switch (keyCode)
 		{
-		case VK_ADD:
+		case 0x6B://VK_ADD:
 			changeTessellationLevel(0.25);
 			break;
-		case VK_SUBTRACT:
+		case 0x6D://VK_SUBTRACT:
 			changeTessellationLevel(-0.25);
 			break;
 		case 'W'://0x57:
@@ -642,24 +642,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		//if (uMsg == WM_KEYDOWN)
-		//{
-		//	switch (wParam)
-		//	{
-		//	case VK_ADD:
-		//		vulkanExample->changeTessellationLevel(0.25);
-		//		break;
-		//	case VK_SUBTRACT:
-		//		vulkanExample->changeTessellationLevel(-0.25);
-		//		break;
-		//	case 0x57:
-		//		vulkanExample->togglePipelines();
-		//		break;
-		//	case 0x53:
-		//		vulkanExample->toggleSplitScreen();
-		//		break;
-		//	}
-		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }

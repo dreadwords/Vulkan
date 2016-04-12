@@ -911,6 +911,8 @@ void VulkanExampleBase::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_CLOSE:
 		prepared = false;
 		DestroyWindow(hWnd);
+		break;
+	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
 	case WM_PAINT:

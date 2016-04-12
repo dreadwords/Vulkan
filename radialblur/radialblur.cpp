@@ -1097,18 +1097,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		//if (uMsg == WM_KEYDOWN)
-		//{
-		//	switch (wParam)
-		//	{
-		//	case 0x42:
-		//		vulkanExample->toggleBlur();
-		//		break;
-		//	case 0x54:
-		//		vulkanExample->toggleTextureDisplay();
-		//		break;
-		//	}
-		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }

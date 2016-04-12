@@ -844,9 +844,10 @@ public:
 	{
 		switch (keyCode)
 		{
-		case VK_ADD:
-		case VK_SUBTRACT:
-			switchComputePipeline((keyCode == VK_ADD) ? 1 : -1);
+		case 0x6B://VK_ADD:
+		case 0x6D://VK_SUBTRACT:
+			switchComputePipeline((keyCode == 0x6B) ? 1 : -1);
+			//switchComputePipeline((keyCode == VK_ADD) ? 1 : -1);
 			break;
 		}
 	}
@@ -860,13 +861,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		//switch (wParam)
-		//{
-		//case VK_ADD:
-		//case VK_SUBTRACT:
-		//	vulkanExample->switchComputePipeline((wParam == VK_ADD) ? 1 : -1);
-		//	break;
-		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }

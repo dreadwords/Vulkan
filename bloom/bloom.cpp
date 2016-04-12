@@ -1309,10 +1309,10 @@ public:
 		case 'B'://0x42
 			toggleBloom();
 			break;
-		case VK_ADD:
+		case 0x6B://VK_ADD:
 			changeBlurScale(0.25f);
 			break;
-		case VK_SUBTRACT:
+		case 0x6D://VK_SUBTRACT:
 			changeBlurScale(-0.25f);
 			break;
 		}
@@ -1334,10 +1334,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		//	case 0x42:
 		//		vulkanExample->toggleBloom();
 		//		break;
-		//	case VK_ADD:
+		//	case 0x6B://VK_ADD:
 		//		vulkanExample->changeBlurScale(0.25f);
 		//		break;
-		//	case VK_SUBTRACT:
+		//	case 0x6D://VK_SUBTRACT:
 		//		vulkanExample->changeBlurScale(-0.25f);
 		//		break;
 		//	}

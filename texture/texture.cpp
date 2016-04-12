@@ -897,10 +897,10 @@ public:
 	{
 		switch (keyCode)
 		{
-		case VK_ADD:
+		case 0x6B://VK_ADD:
 			changeLodBias(0.1f);
 			break;
-		case VK_SUBTRACT:
+		case 0x6D://VK_SUBTRACT:
 			changeLodBias(-0.1f);
 			break;
 		}
@@ -915,18 +915,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (vulkanExample != NULL)
 	{
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);
-		//if (uMsg == WM_KEYDOWN)
-		//{
-		//	switch (wParam)
-		//	{
-		//	case VK_ADD:
-		//		vulkanExample->changeLodBias(0.1f);
-		//		break;
-		//	case VK_SUBTRACT:
-		//		vulkanExample->changeLodBias(-0.1f);
-		//		break;
-		//	}
-		//}
 	}
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }
