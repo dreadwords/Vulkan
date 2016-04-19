@@ -100,6 +100,7 @@ namespace vkTools
 		VkDeviceMemory memory;
 		VkDescriptorBufferInfo descriptor;
 		VkDeviceSize allocSize;
+		void* mapped = nullptr;
 	};
 
 	// Destroy (and free) Vulkan resources used by a uniform data structure

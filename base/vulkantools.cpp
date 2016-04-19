@@ -416,6 +416,11 @@ namespace vkTools
 
 	void destroyUniformData(VkDevice device, vkTools::UniformData *uniformData)
 	{
+		if (uniformData->mapped != nullptr)
+		{
+			vkUnmapMemory(device, uniformData->memory);
+			// TODO: shouldn't we set ->mapped to nullptr here?
+		}
 		vkDestroyBuffer(device, uniformData->buffer, nullptr);
 		vkFreeMemory(device, uniformData->memory, nullptr);
 	}
