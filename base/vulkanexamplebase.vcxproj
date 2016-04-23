@@ -163,6 +163,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="frustum.hpp" />
+    <ClInclude Include="threadpool.hpp" />
     <ClInclude Include="vulkanandroid.h" />
     <ClInclude Include="vulkandebug.h" />
     <ClInclude Include="vulkanexamplebase.h" />

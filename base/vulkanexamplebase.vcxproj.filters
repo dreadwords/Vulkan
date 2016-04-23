@@ -39,6 +39,12 @@
     <ClInclude Include="vulkantools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="frustum.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="threadpool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vulkandebug.cpp">
