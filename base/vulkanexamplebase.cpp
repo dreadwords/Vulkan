@@ -983,7 +983,7 @@ LRESULT VulkanExampleBase::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			paused = !paused;
 			break;
 		case VK_ESCAPE:
-			DestroyWindow(hWnd);
+			PostMessage(hWnd, WM_CLOSE, 0, 0);
 			break;
 		}
 		keyPressed((uint32_t)wParam);
