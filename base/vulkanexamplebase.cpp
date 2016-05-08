@@ -302,7 +302,7 @@ VkBool32 VulkanExampleBase::createBuffer(VkBufferUsageFlags usageFlags, VkMemory
 	{
 		void *mapped;
 		vkTools::checkResult(vkMapMemory(device, *memory, 0, size, 0, &mapped));
-		memcpy(mapped, data, size);
+		memcpy(mapped, data, (size_t)size);
 		vkUnmapMemory(device, *memory);
 	}
 	vkTools::checkResult(vkBindBufferMemory(device, *buffer, *memory, 0));
