@@ -360,6 +360,8 @@ void VulkanExampleBase::loadMesh(
 
 void VulkanExampleBase::renderLoop()
 {
+	destWidth = width;
+	destHeight = height;
 #if defined(_WIN32)
 	MSG msg;
 	while (TRUE)
@@ -396,6 +398,7 @@ void VulkanExampleBase::renderLoop()
 		{
 			std::string windowTitle = getWindowTitle();
 			SetWindowText(window, windowTitle.c_str());
+			lastFPS = frameCounter;
 			fpsTimer = 0.0f;
 			frameCounter = 0;
 		}
@@ -453,6 +456,7 @@ void VulkanExampleBase::renderLoop()
 			if (fpsTimer > 1000.0f)
 			{
 				LOGD("%d fps", frameCounter);
+				lastFPS = frameCounter;
 				fpsTimer = 0.0f;
 				frameCounter = 0.0f;
 			}
@@ -519,6 +523,7 @@ void VulkanExampleBase::renderLoop()
 			xcb_change_property(connection, XCB_PROP_MODE_REPLACE,
 				window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
 				windowTitle.size(), windowTitle.c_str());
+			lastFPS = frameCounter;
 			fpsTimer = 0.0f;
 			frameCounter = 0.0f;
 		}
@@ -978,7 +983,7 @@ LRESULT VulkanExampleBase::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			paused = !paused;
 			break;
 		case VK_ESCAPE:
-			exit(0);
+			DestroyWindow(hWnd);
 			break;
 		}
 		keyPressed((uint32_t)wParam);
@@ -1393,7 +1398,9 @@ void VulkanExampleBase::setupFrameBuffer()
 
 void VulkanExampleBase::setupRenderPass()
 {
-	VkAttachmentDescription attachments[2];
+	VkAttachmentDescription attachments[2] = {};
+
+	// Color attachment
 	attachments[0].format = colorformat;
 	attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
 	attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -1403,6 +1410,7 @@ void VulkanExampleBase::setupRenderPass()
 	attachments[0].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 	attachments[0].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
+	// Depth attachment
 	attachments[1].format = depthFormat;
 	attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
 	attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -1495,7 +1503,7 @@ void VulkanExampleBase::windowResize()
 
 void VulkanExampleBase::windowResized()
 {
-	// Can be overrdiden in derived class
+	// Can be overriden in derived class
 }
 
 void VulkanExampleBase::initSwapchain()

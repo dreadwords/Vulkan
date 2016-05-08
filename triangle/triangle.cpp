@@ -41,7 +41,7 @@ public:
 	struct {
 		VkBuffer buf;
 		VkDeviceMemory mem;
-		VkPipelineVertexInputStateCreateInfo vi;
+		VkPipelineVertexInputStateCreateInfo inputState;
 		std::vector<VkVertexInputBindingDescription> bindingDescriptions;
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 	} vertices;
@@ -533,21 +533,20 @@ public:
 		vertices.attributeDescriptions[0].location = 0;
 		vertices.attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
 		vertices.attributeDescriptions[0].offset = 0;
-		vertices.attributeDescriptions[0].binding = 0;
 		// Location 1 : Color
 		vertices.attributeDescriptions[1].binding = VERTEX_BUFFER_BIND_ID;
 		vertices.attributeDescriptions[1].location = 1;
 		vertices.attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 		vertices.attributeDescriptions[1].offset = sizeof(float) * 3;
-		vertices.attributeDescriptions[1].binding = 0;
 
 		// Assign to vertex buffer
-		vertices.vi.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertices.vi.pNext = NULL;
-		vertices.vi.vertexBindingDescriptionCount = (uint32_t)vertices.bindingDescriptions.size();
-		vertices.vi.pVertexBindingDescriptions = vertices.bindingDescriptions.data();
-		vertices.vi.vertexAttributeDescriptionCount = (uint32_t)vertices.attributeDescriptions.size();
-		vertices.vi.pVertexAttributeDescriptions = vertices.attributeDescriptions.data();
+		vertices.inputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		vertices.inputState.pNext = NULL;
+		vertices.inputState.flags = VK_FLAGS_NONE;
+		vertices.inputState.vertexBindingDescriptionCount = (uint32_t)vertices.bindingDescriptions.size();
+		vertices.inputState.pVertexBindingDescriptions = vertices.bindingDescriptions.data();
+		vertices.inputState.vertexAttributeDescriptionCount = (uint32_t)vertices.attributeDescriptions.size();
+		vertices.inputState.pVertexAttributeDescriptions = vertices.attributeDescriptions.data();
 	}
 
 	void setupDescriptorPool()
@@ -757,7 +756,7 @@ public:
 		// Assign pipeline state create information
 		pipelineCreateInfo.stageCount = (uint32_t)shaderStages.size();
 		pipelineCreateInfo.pStages = shaderStages.data();
-		pipelineCreateInfo.pVertexInputState = &vertices.vi;
+		pipelineCreateInfo.pVertexInputState = &vertices.inputState;
 		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState = &rasterizationState;
 		pipelineCreateInfo.pColorBlendState = &colorBlendState;

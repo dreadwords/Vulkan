@@ -108,7 +108,7 @@ public:
 		}
 
 		textureLoader->destroyTexture(textures.skybox);
-
+	
 		delete(demoMeshes.logos);
 		delete(demoMeshes.background);
 		delete(demoMeshes.models);

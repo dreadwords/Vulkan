@@ -63,6 +63,7 @@ protected:
 	float frameTimer = 1.0f;
 	// Frame counter to display fps
 	uint32_t frameCounter = 0;
+	uint32_t lastFPS = 0;
 	// Vulkan instance, stores all per-application states
 	VkInstance instance;
 	// Physical device (GPU) that Vulkan will ise
@@ -387,7 +388,7 @@ public:
 	}																									\
 	int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)	\
 	{																									\
-		/*_CrtSetBreakAlloc(141);*/																		\
+		_CrtSetBreakAlloc(166);																			\
 		WIN32_CRT_DEBUG_SET_FLAGS()																		\
 		vulkanExample = new VulkanExample();															\
 		vulkanExample->setupWindow(hInstance, WndProc);													\
