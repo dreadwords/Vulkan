@@ -147,8 +147,16 @@ public:
 		err = vkBindImageMemory(device, tex->image, tex->deviceMemory, 0);
 		assert(!err);
 
-		tex->imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		vkTools::setImageLayout(setupCmdBuffer, tex->image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, tex->imageLayout);
+		VkCommandBuffer layoutCmd = VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+
+		tex->imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+		vkTools::setImageLayout(
+			layoutCmd, tex->image, 
+			VK_IMAGE_ASPECT_COLOR_BIT, 
+			VK_IMAGE_LAYOUT_UNDEFINED, 
+			tex->imageLayout);
+
+		VulkanExampleBase::flushCommandBuffer(layoutCmd, queue, true);
 
 		// Create sampler
 		VkSamplerCreateInfo sampler = vkTools::initializers::samplerCreateInfo();
@@ -182,7 +190,7 @@ public:
 	void loadTextures()
 	{
 		textureLoader->loadTexture(
-			getAssetPath() + "textures/igor_and_pal_rgba.ktx", 
+			getAssetPath() + "textures/vulkan_space_rgba8.ktx", 
 			VK_FORMAT_R8G8B8A8_UNORM, 
 			&textureColorMap,
 			false,

@@ -39,6 +39,15 @@
 #include "vulkanswapchain.hpp"
 #include "vulkanTextureLoader.hpp"
 #include "vulkanMeshLoader.hpp"
+#include "vulkantextoverlay.hpp"
+
+#define GAMEPAD_BUTTON_A 0x1000
+#define GAMEPAD_BUTTON_B 0x1001
+#define GAMEPAD_BUTTON_X 0x1002
+#define GAMEPAD_BUTTON_Y 0x1003
+#define GAMEPAD_BUTTON_L1 0x1004
+#define GAMEPAD_BUTTON_R1 0x1005
+#define GAMEPAD_BUTTON_START 0x1006
 
 class VulkanExampleBase
 {
@@ -117,6 +126,8 @@ protected:
 		VkSemaphore presentComplete;
 		// Command buffer submission and execution
 		VkSemaphore renderComplete;
+		// Text overlay submission and execution
+		VkSemaphore textOverlayComplete;
 	} semaphores;
 	// Simple texture loader
 	vkTools::VulkanTextureLoader *textureLoader = nullptr;
@@ -139,6 +150,9 @@ public:
 	
 	bool paused = false;
 
+	bool enableTextOverlay = false;
+	VulkanTextOverlay *textOverlay;
+
 	// Use to adjust mouse rotation speed
 	float rotationSpeed = 1.0f;
 	// Use to adjust mouse zoom speed
@@ -158,15 +172,8 @@ public:
 		VkImageView view;
 	} depthStencil;
 
-	// OS specific 
-#if defined(_WIN32)
-	HWND window;
-	HINSTANCE windowInstance;
-#elif defined(__ANDROID__)
-	android_app* androidApp;
-	// true if application has focused, false if moved to background
-	bool focused = false;
-	// Gamepad state (only one)
+	// Gamepad state (only one pad supported)
+
 	struct
 	{
 		struct
@@ -177,6 +184,15 @@ public:
 			float rz = 0.0f;
 		} axes;
 	} gamePadState;
+
+	// OS specific 
+#if defined(_WIN32)
+	HWND window;
+	HINSTANCE windowInstance;
+#elif defined(__ANDROID__)
+	android_app* androidApp;
+	// true if application has focused, false if moved to background
+	bool focused = false;
 #elif defined(__linux__)
 	struct {
 		bool left = false;
@@ -322,6 +338,24 @@ public:
 	VkSubmitInfo prepareSubmitInfo(
 		std::vector<VkCommandBuffer> commandBuffers,
 		VkPipelineStageFlags *pipelineStages);
+
+	void updateTextOverlay();
+
+	// Called when the text overlay is updating
+	// Can be overriden in derived class to add custom text to the overlay
+	virtual void getOverlayText(VulkanTextOverlay * textOverlay);
+
+	// Prepare the frame for workload submission
+	// - Acquires the next image from the swap chain 
+	// - Submits a post present barrier
+	// - Sets the default wait and signal semaphores
+	void prepareFrame();
+
+	// Submit the frames' workload 
+	// - Submits the text overlay (if enabled)
+	// - 
+	void submitFrame();
+
 };
 
 // ----------- Main entry point
