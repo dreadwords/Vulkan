@@ -134,7 +134,8 @@ namespace detail
 		FILE* File = 0;
 		fopen_s(&File, Filename, "wb");
 #endif
-
+		if(0 == File)
+			return false;
 		std::vector<char> Memory;
 		bool const Result = save_ktx(Texture, Memory);
 
