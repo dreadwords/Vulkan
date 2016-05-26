@@ -594,24 +594,6 @@ public:
 		reBuildCommandBuffers();
 	}
 
-	virtual void keyPressed(uint32_t keyCode)
-	{
-		switch (keyCode)
-		{
-		case 0x6B://VK_ADD:
-			changeTessellationLevel(0.25);
-			break;
-		case 0x6D://VK_SUBTRACT:
-			changeTessellationLevel(-0.25);
-			break;
-		case 'W'://0x57:
-			togglePipelines();
-			break;
-		case 'S'://0x53:
-			toggleSplitScreen();
-			break;
-		}
-	}
 };
 
 DEFINE_VULKAN_APPLICATION_ENTRY_POINT();
