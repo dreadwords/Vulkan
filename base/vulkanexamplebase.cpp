@@ -64,6 +64,13 @@ VkResult VulkanExampleBase::createDevice(VkDeviceQueueCreateInfo requestedQueues
 	deviceCreateInfo.pQueueCreateInfos = &requestedQueues;
 	deviceCreateInfo.pEnabledFeatures = NULL;
 
+	// enable the debug marker extension if it is present (likely meaning a debugging tool is present)
+	if (vkTools::checkDeviceExtensionPresent(physicalDevice, VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+	{
+		enabledExtensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+		enableDebugMarkers = true;
+	}
+
 	if (enabledExtensions.size() > 0)
 	{
 		deviceCreateInfo.enabledExtensionCount = (uint32_t)enabledExtensions.size();
@@ -124,17 +131,14 @@ void VulkanExampleBase::createCommandBuffers()
 			VK_COMMAND_BUFFER_LEVEL_PRIMARY,
 			(uint32_t)drawCmdBuffers.size());
 
-	VkResult vkRes = vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, drawCmdBuffers.data());
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, drawCmdBuffers.data()));
 
 	// Command buffers for submitting present barriers
 	cmdBufAllocateInfo.commandBufferCount = 1;
 	// Pre present
-	vkRes = vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &prePresentCmdBuffer);
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &prePresentCmdBuffer));
 	// Post present
-	vkRes = vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &postPresentCmdBuffer);
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &postPresentCmdBuffer));
 }
 
 void VulkanExampleBase::destroyCommandBuffers()
@@ -158,36 +162,28 @@ void VulkanExampleBase::createSetupCommandBuffer()
 			VK_COMMAND_BUFFER_LEVEL_PRIMARY,
 			1);
 
-	VkResult vkRes = vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &setupCmdBuffer);
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &setupCmdBuffer));
 
 	VkCommandBufferBeginInfo cmdBufInfo = {};
 	cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-	vkRes = vkBeginCommandBuffer(setupCmdBuffer, &cmdBufInfo);
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkBeginCommandBuffer(setupCmdBuffer, &cmdBufInfo));
 }
 
 void VulkanExampleBase::flushSetupCommandBuffer()
 {
-	VkResult err;
-
 	if (setupCmdBuffer == VK_NULL_HANDLE)
 		return;
 
-	err = vkEndCommandBuffer(setupCmdBuffer);
-	assert(!err);
+	VK_CHECK_RESULT(vkEndCommandBuffer(setupCmdBuffer));
 
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &setupCmdBuffer;
 
-	err = vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
-	assert(!err);
-
-	err = vkQueueWaitIdle(queue);
-	assert(!err);
+	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+	VK_CHECK_RESULT(vkQueueWaitIdle(queue));
 
 	vkFreeCommandBuffers(device, cmdPool, 1, &setupCmdBuffer);
 	setupCmdBuffer = VK_NULL_HANDLE; 
@@ -242,8 +238,7 @@ void VulkanExampleBase::createPipelineCache()
 {
 	VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 	pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-	VkResult err = vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &pipelineCache);
-	assert(!err);
+	VK_CHECK_RESULT(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
 }
 
 void VulkanExampleBase::prepare()
@@ -251,6 +246,10 @@ void VulkanExampleBase::prepare()
 	if (enableValidation)
 	{
 		vkDebug::setupDebugging(instance, VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT, VK_NULL_HANDLE);
+	}
+	if (enableDebugMarkers)
+	{
+		vkDebug::debugReport::setupDebugMarkers(device);
 	}
 	createCommandPool();
 	createSetupCommandBuffer();
@@ -504,7 +503,7 @@ void VulkanExampleBase::renderLoop()
 				lastFPS = frameCounter;
 				updateTextOverlay();
 				fpsTimer = 0.0f;
-				frameCounter = 0.0f;
+				frameCounter = 0;
 			}
 			// Check gamepad state
 			const float deadZone = 0.0015f;
@@ -575,7 +574,7 @@ void VulkanExampleBase::renderLoop()
 			lastFPS = frameCounter;
 			updateTextOverlay();
 			fpsTimer = 0.0f;
-			frameCounter = 0.0f;
+			frameCounter = 0;
 		}
 	}
 #endif
@@ -585,8 +584,7 @@ void VulkanExampleBase::submitPrePresentBarrier(VkImage image)
 {
 	VkCommandBufferBeginInfo cmdBufInfo = vkTools::initializers::commandBufferBeginInfo();
 
-	VkResult vkRes = vkBeginCommandBuffer(prePresentCmdBuffer, &cmdBufInfo);
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkBeginCommandBuffer(prePresentCmdBuffer, &cmdBufInfo));
 
 	VkImageMemoryBarrier prePresentBarrier = vkTools::initializers::imageMemoryBarrier();
 	prePresentBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
@@ -607,23 +605,20 @@ void VulkanExampleBase::submitPrePresentBarrier(VkImage image)
 		0, nullptr, // No buffer barriers,
 		1, &prePresentBarrier);
 
-	vkRes = vkEndCommandBuffer(prePresentCmdBuffer);
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkEndCommandBuffer(prePresentCmdBuffer));
 
 	VkSubmitInfo submitInfo = vkTools::initializers::submitInfo();
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &prePresentCmdBuffer;
 
-	vkRes = vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 }
 
 void VulkanExampleBase::submitPostPresentBarrier(VkImage image)
 {
 	VkCommandBufferBeginInfo cmdBufInfo = vkTools::initializers::commandBufferBeginInfo();
 
-	VkResult vkRes = vkBeginCommandBuffer(postPresentCmdBuffer, &cmdBufInfo);
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkBeginCommandBuffer(postPresentCmdBuffer, &cmdBufInfo));
 
 	VkImageMemoryBarrier postPresentBarrier = vkTools::initializers::imageMemoryBarrier();
 	postPresentBarrier.srcAccessMask = 0;
@@ -644,15 +639,13 @@ void VulkanExampleBase::submitPostPresentBarrier(VkImage image)
 		0, nullptr, // No buffer barriers,
 		1, &postPresentBarrier);
 
-	vkRes = vkEndCommandBuffer(postPresentCmdBuffer);
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkEndCommandBuffer(postPresentCmdBuffer));
 
 	VkSubmitInfo submitInfo = vkTools::initializers::submitInfo();
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &postPresentCmdBuffer;
 
-	vkRes = vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 }
 
 VkSubmitInfo VulkanExampleBase::prepareSubmitInfo(
@@ -663,7 +656,7 @@ VkSubmitInfo VulkanExampleBase::prepareSubmitInfo(
 	submitInfo.pWaitDstStageMask = pipelineStages;
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = &semaphores.presentComplete;
-	submitInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+	submitInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 	submitInfo.pCommandBuffers = commandBuffers.data();
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = &semaphores.renderComplete;
@@ -863,8 +856,7 @@ void VulkanExampleBase::initVulkan(bool enableValidation)
 	// Physical device
 	uint32_t gpuCount = 0;
 	// Get number of available physical devices
-	err = vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr);
-	assert(!err);
+	VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
 	assert(gpuCount > 0);
 	// Enumerate devices
 	std::vector<VkPhysicalDevice> physicalDevices(gpuCount);
@@ -905,8 +897,7 @@ void VulkanExampleBase::initVulkan(bool enableValidation)
 	queueCreateInfo.queueCount = 1;
 	queueCreateInfo.pQueuePriorities = queuePriorities.data();
 
-	err = createDevice(queueCreateInfo, enableValidation);
-	assert(!err);
+	VK_CHECK_RESULT(createDevice(queueCreateInfo, enableValidation));
 
 	// Store properties (including limits) and features of the phyiscal device
 	// So examples can check against them and see if a feature is actually supported
@@ -955,8 +946,9 @@ void VulkanExampleBase::setupConsole(std::string title)
 {
 	AllocConsole();
 	AttachConsole(GetCurrentProcessId());
-	FILE* fp = stdout;
-	freopen_s(&fp, "CON", "w", stdout);
+
+	FILE *stream;
+	freopen_s(&stream, "CONOUT$", "w+", stdout);
 	SetConsoleTitle(TEXT(title.c_str()));
 	if (enableValidation)
 	{
@@ -1498,8 +1490,7 @@ void VulkanExampleBase::createCommandPool()
 	cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	cmdPoolInfo.queueFamilyIndex = swapChain.queueNodeIndex;
 	cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	VkResult vkRes = vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &cmdPool);
-	assert(!vkRes);
+	VK_CHECK_RESULT(vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &cmdPool));
 }
 
 void VulkanExampleBase::setupDepthStencil()
@@ -1537,18 +1528,14 @@ void VulkanExampleBase::setupDepthStencil()
 	depthStencilView.subresourceRange.layerCount = 1;
 
 	VkMemoryRequirements memReqs;
-	VkResult err;
 
-	err = vkCreateImage(device, &image, nullptr, &depthStencil.image);
-	assert(!err);
+	VK_CHECK_RESULT(vkCreateImage(device, &image, nullptr, &depthStencil.image));
 	vkGetImageMemoryRequirements(device, depthStencil.image, &memReqs);
 	mem_alloc.allocationSize = memReqs.size;
-	getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mem_alloc.memoryTypeIndex);
-	err = vkAllocateMemory(device, &mem_alloc, nullptr, &depthStencil.mem);
-	assert(!err);
-
-	err = vkBindImageMemory(device, depthStencil.image, depthStencil.mem, 0);
-	assert(!err);
+	mem_alloc.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	VK_CHECK_RESULT(vkAllocateMemory(device, &mem_alloc, nullptr, &depthStencil.mem));
+	
+	VK_CHECK_RESULT(vkBindImageMemory(device, depthStencil.image, depthStencil.mem, 0));
 	vkTools::setImageLayout(
 		setupCmdBuffer,
 		depthStencil.image,
@@ -1557,8 +1544,7 @@ void VulkanExampleBase::setupDepthStencil()
 		VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
 	depthStencilView.image = depthStencil.image;
-	err = vkCreateImageView(device, &depthStencilView, nullptr, &depthStencil.view);
-	assert(!err);
+	VK_CHECK_RESULT(vkCreateImageView(device, &depthStencilView, nullptr, &depthStencil.view));
 }
 
 void VulkanExampleBase::setupFrameBuffer()
@@ -1583,8 +1569,7 @@ void VulkanExampleBase::setupFrameBuffer()
 	for (uint32_t i = 0; i < frameBuffers.size(); i++)
 	{
 		attachments[0] = swapChain.buffers[i].view;
-		VkResult err = vkCreateFramebuffer(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]);
-		assert(!err);
+		VK_CHECK_RESULT(vkCreateFramebuffer(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
 	}
 }
 
@@ -1642,10 +1627,7 @@ void VulkanExampleBase::setupRenderPass()
 	renderPassInfo.dependencyCount = 0;
 	renderPassInfo.pDependencies = NULL;
 
-	VkResult err;
-
-	err = vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass);
-	assert(!err);
+	VK_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass));
 }
 
 void VulkanExampleBase::windowResize()
