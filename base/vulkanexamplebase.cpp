@@ -249,7 +249,7 @@ void VulkanExampleBase::prepare()
 	}
 	if (enableDebugMarkers)
 	{
-		vkDebug::debugReport::setupDebugMarkers(device);
+		vkDebug::DebugMarker::setup(device);
 	}
 	createCommandPool();
 	createSetupCommandBuffer();
