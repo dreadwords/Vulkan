@@ -100,6 +100,8 @@ public:
 		vkDestroyPipeline(device, pipelines.solid, nullptr);
 		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		vkDestroyBuffer(device, instanceBuffer.buffer, nullptr);
+		vkFreeMemory(device, instanceBuffer.memory, nullptr);
 		vkMeshLoader::freeMeshBufferResources(device, &meshes.example);
 		vkTools::destroyUniformData(device, &uniformData.vsScene);
 		textureLoader->destroyTexture(textures.colorMap);
@@ -125,7 +127,7 @@ public:
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
 
-			vkTools::checkResult(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -151,14 +153,14 @@ public:
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 
-			vkTools::checkResult(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
 	void draw()
 	{
 		// Get next image in the swap chain (back/front buffer)
-		vkTools::checkResult(swapChain.acquireNextImage(semaphores.presentComplete, &currentBuffer));
+		VK_CHECK_RESULT(swapChain.acquireNextImage(semaphores.presentComplete, &currentBuffer));
 
 		submitPostPresentBarrier(swapChain.buffers[currentBuffer].image);
 
@@ -167,13 +169,13 @@ public:
 		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
 
 		// Submit to queue
-		vkTools::checkResult(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		submitPrePresentBarrier(swapChain.buffers[currentBuffer].image);
 
-		vkTools::checkResult(swapChain.queuePresent(queue, currentBuffer, semaphores.renderComplete));
+		VK_CHECK_RESULT(swapChain.queuePresent(queue, currentBuffer, semaphores.renderComplete));
 
-		vkTools::checkResult(vkQueueWaitIdle(queue));
+		VK_CHECK_RESULT(vkQueueWaitIdle(queue));
 	}
 
 	void loadMeshes()
@@ -524,12 +526,17 @@ public:
 		instanceBuffer.descriptor.range = instanceBuffer.size;
 		instanceBuffer.descriptor.buffer = instanceBuffer.buffer;
 		instanceBuffer.descriptor.offset = 0;
+
+		// Destroy staging resources
+		vkDestroyBuffer(device, stagingBuffer.buffer, nullptr);
+		vkFreeMemory(device, stagingBuffer.memory, nullptr);
 	}
 
 	void prepareUniformBuffers()
 	{
 		createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			sizeof(uboVS),
 			nullptr,
 			&uniformData.vsScene.buffer,
@@ -537,7 +544,7 @@ public:
 			&uniformData.vsScene.descriptor);
 
 		// Map for host access
-		vkTools::checkResult(vkMapMemory(device, uniformData.vsScene.memory, 0, sizeof(uboVS), 0, (void **)&uniformData.vsScene.mapped));
+		VK_CHECK_RESULT(vkMapMemory(device, uniformData.vsScene.memory, 0, sizeof(uboVS), 0, (void **)&uniformData.vsScene.mapped));
 
 		updateUniformBuffer(true);
 	}
@@ -586,7 +593,6 @@ public:
 		draw();
 		if (!paused)
 		{
-			vkDeviceWaitIdle(device);
 			updateUniformBuffer(false);
 		}
 	}
