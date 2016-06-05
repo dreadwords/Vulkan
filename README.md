@@ -49,14 +49,17 @@ This example is far more explicit than the other examples and is meant to be a s
 ## [Texture mapping](texture/)
 <img src="./screenshots/basic_texture.png" height="96px" align="right">
 
-Loads a single texture and displays it on a simple quad. Shows how to upload a texture including mip maps to the gpu in an optimal (tiling) format. Also demonstrates how to display the texture using a combined image sampler with anisotropic filtering enabled.
+Shows how to upload a 2D texture to video memory for sampling in a shader. Loads a compressed texture into a host visible staging buffer and copies all mip levels to a device local optimal tiled image for best performance.
+
+Also demonstrates the use of (combined) image samplers. Samplers are detached from the actual texture image and only contain information on how a image is sampled in the shader.
 <br><br>
 
-## [Cubemap](texturecubemap/)
-<img src="./screenshots/texture_cubemap.png" height="96px" align="right">
+## [Cubemap texture](texturecubemap/)
+<img src="./screenshots/texture_cubemap.jpg" height="96px" align="right">
 
-Building on the basic texture loading example a cubemap is loaded into host visible memory and then transformed into an optimal format for the GPU.
-The demo uses two different pipelines (and shader sets) to display the cubemap as a skybox (background) and as a source for reflections.
+Building on the basic texture loading example, a cubemap texture is loaded into a staging buffer and is copied over to a device local optimal image using buffer to image copies for all of it's faces and mip maps.
+
+The demo then uses two different pipelines (and shader sets) to display the cubemap as a skybox (background) and as a source for reflections.
 <br><br>
 
 ## [Texture array](texturearray/)
@@ -114,7 +117,7 @@ Demonstrates the use of resolve attachments for doing multisampling. Instead of 
 <br><br>
 
 ## [Multi threaded command buffer generation](multithreading/)
-<img src="./screenshots/multithreading.png" height="96px" align="right">
+<img src="./screenshots/multithreading.jpg" height="96px" align="right">
 This example demonstrates multi threaded command buffer generation. All available hardware threads are used to generated n secondary command buffers concurrent, with each thread also checking object visibility against the current viewing frustum. Command buffers are rebuilt on each frame.
 
 Once all threads have finished (and all secondary command buffers have been constructed), the secondary command buffers are executed inside the primary command buffer and submitted to the queue.
@@ -138,19 +141,23 @@ Shows how to use occlusion queries to determine object visibility depending on t
 <br><br>
 
 ## [Offscreen rendering](offscreen/)
-<img src="./screenshots/basic_offscreen.png" height="96px" align="right">
+<img src="./screenshots/basic_offscreen.jpg" height="96px" align="right">
 
-Uses a separate framebuffer (that is not part of the swap chain) and a texture target for offscreen rendering. The texture is then used as a mirror.
+Shows how to do basic offscreen rendering. Uses a separate framebuffer with color and depth attachments (that is not part of the swap chain) to render the mirrored scene off screen in the first pass.
+
+The second pass then samples from the color attachment of that framebuffer for rendering a mirror surface.
 <br><br>
 
 ## [Radial blur](radialblur/)
 <img src="./screenshots/radial_blur.png" height="96px" align="right">
 
-Demonstrates basic usage of fullscreen shader effects. The scene is rendered offscreen first, gets blitted to a texture target and for the final draw this texture is blended on top of the 3D scene with a radial blur shader applied.
+Demonstrates basic usage of fullscreen shader effects. The scene is rendered into a low resolution offscreen framebuffer first.
+
+After rendering the object the second pass then blends a full screen quad on top of the scene, sampling from the color attachment of the offscreen framebuffer ti implement a radial blur.
 <br><br>
 
 ## [Bloom](bloom/)
-<img src="./screenshots/bloom.png" height="96px" align="right">
+<img src="./screenshots/bloom.jpg" height="96px" align="right">
 
 Implements a bloom effect to simulate glowing parts of a 3D mesh. A two pass gaussian blur (horizontal and then vertical) is used to generate a blurred low res version of the scene only containing the glowing parts of the 3D mesh. This then gets blended onto the scene to add the blur effect.
 <br><br>
@@ -163,18 +170,21 @@ Demonstrates the use of multiple render targets to fill a G-Buffer for deferred 
 Deferred shading collects all values (color, normal, position) into different render targets in one pass thanks to multiple render targets, and then does all shading and lighting calculations based on these in screen space, thus allowing for much more light sources than traditional forward renderers.
 <br><br>
 
-## [Shadowmapping](shadowmapping/)
+## [Shadow mapping](shadowmapping/)
 <img src="./screenshots/shadowmapping.png" height="96px" align="right">
 
-Shows how to implement directional dynamic shadows with a single shadow map in two passes. Pass one renders the scene from the light's point of view and copies the depth buffer to a depth texture.
-The second pass renders the scene from the camera's point of view using the depth texture to compare the depth value of the texels with the one stored in the depth texture to determine whether a texel is shadowed or not and also applies a PCF filter for smooth shadow borders.
+Shows how to implement dynamic shadows from a directional light source in two passes. The first pass renders the scene depth from the light's point-of-view into a separate framebuffer attachment with a different (higher) resolution.
+
+The second pass renders the scene from the camera's point-of-view and compares the depth value of the texels with the one stored in the offscreen depth attachment (which the shader directly samples from) to determine whether a texel is shadowed or not and then applies a PCF filter to smooth out shadow borders
+
 To avoid shadow artifacts the dynamic depth bias state ([vkCmdSetDepthBias](https://www.khronos.org/registry/vulkan/specs/1.0/man/html/vkCmdSetDepthBias.html)) is used to apply a constant and slope dept bias factor.
 
 ## [Omnidirectional shadow mapping](shadowmappingomni/)
 <img src="./screenshots/shadow_omnidirectional.png" height="96px" align="right">
 
-Uses a dynamic 32 bit floating point cube map for a point light source that casts shadows in all directions (unlike projective shadow mapping).
-The cube map faces contain the distances from the light sources, which are then used in the scene rendering pass to determine if the fragment is shadowed or not.
+Shows how to implement dynamic shadows from a point light source. Uses a dynamic 32 bit floating point cube map for a point light source that casts shadows in all directions (unlike projective shadow mapping).
+
+The cube map faces contain the distances from the light sources, which are then used in the final scene rendering pass to determine if the fragment is shadowed or not.
 <br><br>
 
 ## [Spherical environment mapping](sphericalenvmapping/)

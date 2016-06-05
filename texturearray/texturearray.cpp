@@ -83,8 +83,8 @@ public:
 		zoom = -15.0f;
 		rotationSpeed = 0.25f;
 		rotation = { -15.0f, 35.0f, 0.0f };
+		enableTextOverlay = true;
 		title = "Vulkan Example - Texture arrays";
-		srand((unsigned int)time(NULL));
 	}
 
 	~VulkanExample()
@@ -366,27 +366,6 @@ public:
 		}
 	}
 
-	void draw()
-	{
-		// Get next image in the swap chain (back/front buffer)
-		VK_CHECK_RESULT(swapChain.acquireNextImage(semaphores.presentComplete, &currentBuffer));
-
-		submitPostPresentBarrier(swapChain.buffers[currentBuffer].image);
-
-		// Command buffer to be sumitted to the queue
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
-
-		// Submit to queue
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
-
-		submitPrePresentBarrier(swapChain.buffers[currentBuffer].image);
-
-		VK_CHECK_RESULT(swapChain.queuePresent(queue, currentBuffer, semaphores.renderComplete));
-
-		VK_CHECK_RESULT(vkQueueWaitIdle(queue));
-	}
-
 	// Setup vertices for a single uv-mapped quad
 	void generateQuad()
 	{
@@ -623,6 +602,7 @@ public:
 		// Vertex shader uniform buffer block
 		createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			uboSize,
 			&uboVS,
 			&uniformData.vertexShader.buffer,
@@ -673,6 +653,17 @@ public:
 		vkUnmapMemory(device, uniformData.vertexShader.memory);
 	}
 
+	void draw()
+	{
+		VulkanExampleBase::prepareFrame();
+
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+
+		VulkanExampleBase::submitFrame();
+	}
+
 	void prepare()
 	{
 		VulkanExampleBase::prepare();
@@ -692,9 +683,7 @@ public:
 	{
 		if (!prepared)
 			return;
-		vkDeviceWaitIdle(device);
 		draw();
-		vkDeviceWaitIdle(device);
 	}
 
 	virtual void viewChanged()

@@ -397,6 +397,7 @@ public:
 		zoomSpeed = 2.5f;
 		rotationSpeed = 0.5f;
 		rotation = { -182.5f, -38.5f, 180.0f };
+		enableTextOverlay = true;
 		title = "Vulkan Example - Skeletal animation";
 		cameraPos = { 0.0f, 0.0f, 12.0f };
 	}
@@ -474,27 +475,6 @@ public:
 
 			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
-	}
-
-	void draw()
-	{
-		// Get next image in the swap chain (back/front buffer)
-		VK_CHECK_RESULT(swapChain.acquireNextImage(semaphores.presentComplete, &currentBuffer));
-
-		submitPostPresentBarrier(swapChain.buffers[currentBuffer].image);
-
-		// Command buffer to be sumitted to the queue
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
-
-		// Submit to queue
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
-
-		submitPrePresentBarrier(swapChain.buffers[currentBuffer].image);
-
-		VK_CHECK_RESULT(swapChain.queuePresent(queue, currentBuffer, semaphores.renderComplete));
-
-		VK_CHECK_RESULT(vkQueueWaitIdle(queue));
 	}
 
 	// Load a mesh based on data read via assimp 
@@ -937,6 +917,7 @@ public:
 		// Vertex shader uniform buffer block
 		createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			sizeof(uboVS),
 			nullptr,
 			&uniformData.vsScene.buffer,
@@ -949,6 +930,7 @@ public:
 		// Floor
 		createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			sizeof(uboFloor),
 			nullptr,
 			&uniformData.floor.buffer,
@@ -990,7 +972,7 @@ public:
 		// Update bones
 		skinnedMesh->update(runningTime);
 		for (uint32_t i = 0; i < skinnedMesh->boneTransforms.size(); i++)
-  		{
+		{
 			uboVS.bones[i] = glm::transpose(glm::make_mat4(&skinnedMesh->boneTransforms[i].a1));
 		}
 
@@ -999,6 +981,17 @@ public:
 		// Update floor animation
 		uboFloor.uvOffset.t -= 0.5f * skinnedMesh->animationSpeed * frameTimer;
 		memcpy(uniformData.floor.mapped, &uboFloor, sizeof(uboFloor));
+	}
+
+	void draw()
+	{
+		VulkanExampleBase::prepareFrame();
+
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+
+		VulkanExampleBase::submitFrame();
 	}
 
 	void prepare()
@@ -1039,7 +1032,35 @@ public:
 	void changeAnimationSpeed(float delta)
 	{
 		skinnedMesh->animationSpeed += delta;
-		std::cout << "Animation speed = " << skinnedMesh->animationSpeed << std::endl;
+	}
+
+	virtual void keyPressed(uint32_t keyCode)
+	{
+		switch (keyCode)
+		{
+		case 0x6B:
+		case GAMEPAD_BUTTON_R1:
+			changeAnimationSpeed(0.1f);
+			break;
+		case 0x6D:
+		case GAMEPAD_BUTTON_L1:
+			changeAnimationSpeed(-0.1f);
+			break;
+		}
+	}
+
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	{
+		if (skinnedMesh != nullptr)
+		{
+			std::stringstream ss;
+			ss << std::setprecision(2) << std::fixed << skinnedMesh->animationSpeed;
+#if defined(__ANDROID__)
+			textOverlay->addText("Animation speed: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+#else
+			textOverlay->addText("Animation speed: " + ss.str() + " (numpad +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+#endif
+		}
 	}
 };
 

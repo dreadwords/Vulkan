@@ -578,6 +578,8 @@ void VulkanExampleBase::renderLoop()
 		}
 	}
 #endif
+	// Flush device to make sure all resources can be freed 
+	vkDeviceWaitIdle(device);
 }
 
 void VulkanExampleBase::submitPrePresentBarrier(VkImage image)
