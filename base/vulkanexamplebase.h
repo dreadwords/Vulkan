@@ -212,7 +212,7 @@ public:
 	VulkanExampleBase(bool enableValidation);
 
 	// dtor
-	~VulkanExampleBase();
+	virtual ~VulkanExampleBase();
 
 	// Setup the vulkan instance, enable required extensions and connect to the physical device (GPU)
 	void initVulkan(bool enableValidation);
@@ -371,80 +371,29 @@ public:
 
 };
 
-// ----------- Main entry point
-#if defined(__ANDROID__)
-// Android entry point
-#	define DEFINE_VULKAN_APPLICATION_ENTRY_POINT()														\
-	VulkanExample *vulkanExample;																		\
-																										\
-	void android_main(android_app* state)																\
-	{																									\
-		/* Removing this may cause the compiler to omit the main entry point 	*/						\
-		/* which would make the application crash at start						*/						\
-		app_dummy();																					\
-																										\
-		vulkanExample = new VulkanExample();															\
-		/* Attach vulkan example to global android application state			*/						\
-		state->userData = vulkanExample;																\
-		state->onAppCmd = VulkanExample::handleAppCommand;												\
-		state->onInputEvent = VulkanExample::handleAppInput;											\
-		vulkanExample->androidApp = state;																\
-		vulkanExample->renderLoop();																	\
-		delete(vulkanExample);																			\
-	}
 
-#elif defined(__linux__)
-// Linux entry point
-#	define DEFINE_VULKAN_APPLICATION_ENTRY_POINT()														\
-	VulkanExample *vulkanExample;																		\
-																										\
-	static void handleEvent(const xcb_generic_event_t *event)											\
-	{																									\
-		if (vulkanExample != NULL)																		\
-		{																								\
-			vulkanExample->handleEvent(event);															\
-		}																								\
-	}																									\
-	int main(const int argc, const char *argv[])														\
-	{																									\
-		vulkanExample = new VulkanExample();															\
-		vulkanExample->setupWindow();																	\
-		vulkanExample->initSwapchain();																	\
-		vulkanExample->prepare();																		\
-		vulkanExample->renderLoop();																	\
-		delete(vulkanExample);																			\
-		return 0;																						\
-	}
+extern "C"
+{
+	int32_t createVulkanExample(VulkanExampleBase** vulkanExample);
+	int32_t deleteVulkanExample(VulkanExampleBase** vulkanExample);
+}
 
-#elif defined(_WIN32)
-#	if defined(DEBUG) || defined(_DEBUG)
-#		define WIN32_CRT_DEBUG_SET_FLAGS() 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF /*| _CRTDBG_CHECK_CRT_DF */| _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //_CRTDBG_CHECK_ALWAYS_DF)
-#	else
-#		define WIN32_CRT_DEBUG_SET_FLAGS() 	
-#	endif
-// Windows entry point
-#	define DEFINE_VULKAN_APPLICATION_ENTRY_POINT()														\
-	VulkanExample *vulkanExample;																		\
-																										\
-	LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)						\
-	{																									\
-		if (vulkanExample != NULL)																		\
-		{																								\
-			return vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);							\
-		}																								\
-		return (DefWindowProc(hWnd, uMsg, wParam, lParam));												\
-	}																									\
-	int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)	\
-	{																									\
-		/*_CrtSetBreakAlloc(166);*/																			\
-		WIN32_CRT_DEBUG_SET_FLAGS()																		\
-		vulkanExample = new VulkanExample();															\
-		vulkanExample->setupWindow(hInstance, WndProc);													\
-		vulkanExample->initSwapchain();																	\
-		vulkanExample->prepare();																		\
-		vulkanExample->renderLoop();																	\
-		delete(vulkanExample);																			\
-		return 0;																						\
-	}
 
-#endif
+#define DEFINE_VULKAN_APPLICATION_MANAGEMENT_FUNCTIONS()					\
+	int32_t createVulkanExample(VulkanExampleBase** createdVulkanExample)	\
+	{																		\
+		VulkanExample* newVulkanExample = new VulkanExample();				\
+		VulkanExampleBase* oldVulkanExample = *createdVulkanExample;		\
+		*createdVulkanExample = newVulkanExample;							\
+		if(oldVulkanExample)												\
+			delete(oldVulkanExample);										\
+		return 0;															\
+	};																		\
+	int32_t deleteVulkanExample(VulkanExampleBase** vulkanExample)			\
+	{																		\
+		VulkanExampleBase* oldVulkanExample = *vulkanExample;				\
+		*vulkanExample = 0;													\
+		if(oldVulkanExample)												\
+			delete(oldVulkanExample);										\
+		return 0;															\
+	};

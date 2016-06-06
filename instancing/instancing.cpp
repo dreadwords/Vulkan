@@ -96,7 +96,7 @@ public:
 		srand((unsigned int)time(NULL));
 	}
 
-	~VulkanExample()
+	virtual ~VulkanExample()
 	{
 		vkDestroyPipeline(device, pipelines.solid, nullptr);
 		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
@@ -597,4 +597,4 @@ public:
 	}
 };
 
-DEFINE_VULKAN_APPLICATION_ENTRY_POINT();
+DEFINE_VULKAN_APPLICATION_MANAGEMENT_FUNCTIONS();

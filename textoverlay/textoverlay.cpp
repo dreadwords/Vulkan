@@ -745,7 +745,7 @@ public:
 		enableTextOverlay = false;
 	}
 
-	~VulkanExample()
+	virtual ~VulkanExample()
 	{
 		vkDestroyPipeline(device, pipelines.solid, nullptr);
 		vkDestroyPipeline(device, pipelines.background, nullptr);

@@ -50,7 +50,7 @@ public:
 		title = "Vulkan Example - Gears";
 	}
 
-	~VulkanExample()
+	virtual ~VulkanExample()
 	{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
@@ -399,4 +399,4 @@ public:
 	}
 };
 
-DEFINE_VULKAN_APPLICATION_ENTRY_POINT();
+DEFINE_VULKAN_APPLICATION_MANAGEMENT_FUNCTIONS();
