@@ -371,13 +371,11 @@ public:
 
 };
 
-
 extern "C"
 {
 	int32_t createVulkanExample(VulkanExampleBase** vulkanExample);
 	int32_t deleteVulkanExample(VulkanExampleBase** vulkanExample);
 }
-
 
 #define DEFINE_VULKAN_APPLICATION_MANAGEMENT_FUNCTIONS()					\
 	int32_t createVulkanExample(VulkanExampleBase** createdVulkanExample)	\
