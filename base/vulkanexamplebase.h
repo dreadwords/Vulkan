@@ -40,6 +40,7 @@
 #include "vulkanTextureLoader.hpp"
 #include "vulkanMeshLoader.hpp"
 #include "vulkantextoverlay.hpp"
+#include "camera.hpp"
 
 #define GAMEPAD_BUTTON_A 0x1000
 #define GAMEPAD_BUTTON_B 0x1001
@@ -56,6 +57,8 @@ private:
 	bool enableValidation = false;
 	// Set to true when the debug marker extension is detected
 	bool enableDebugMarkers = false;
+	// Set tot true if v-sync will be forced for the swapchain
+	bool enableVSync = false;
 	// fps timer (one second interval)
 	float fpsTimer = 0.0f;
 	// Create application wide Vulkan instance
@@ -159,6 +162,8 @@ public:
 	float rotationSpeed = 1.0f;
 	// Use to adjust mouse zoom speed
 	float zoomSpeed = 1.0f;
+
+	Camera camera;
 
 	glm::vec3 rotation = glm::vec3();
 	glm::vec3 cameraPos = glm::vec3();

@@ -45,6 +45,12 @@
     <ClInclude Include="threadpool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="vulkantextoverlay.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vulkandebug.cpp">

@@ -163,6 +163,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.hpp" />
     <ClInclude Include="frustum.hpp" />
     <ClInclude Include="threadpool.hpp" />
     <ClInclude Include="vulkanandroid.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="vulkanexamplebase.h" />
     <ClInclude Include="vulkanMeshLoader.hpp" />
     <ClInclude Include="vulkanswapchain.hpp" />
+    <ClInclude Include="vulkantextoverlay.hpp" />
     <ClInclude Include="vulkanTextureLoader.hpp" />
     <ClInclude Include="vulkantools.h" />
   </ItemGroup>

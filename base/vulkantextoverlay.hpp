@@ -67,6 +67,8 @@ private:
 
 	// Pointer to mapped vertex buffer
 	glm::vec4 *mapped = nullptr;
+	// Used during text updates
+	glm::vec4 *mappedLocal = nullptr;
 
 	stb_fontchar stbFontData[STB_NUM_CHARS];
 	uint32_t numLetters;
@@ -187,10 +189,13 @@ public:
 
 		vkGetBufferMemoryRequirements(device, buffer, &memReqs);
 		allocInfo.allocationSize = memReqs.size;
-		allocInfo.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
+		allocInfo.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		VK_CHECK_RESULT(vkAllocateMemory(device, &allocInfo, nullptr, &memory));
 		VK_CHECK_RESULT(vkBindBufferMemory(device, buffer, memory, 0));
+
+		// Map persistent
+		VK_CHECK_RESULT(vkMapMemory(device, memory, 0, VK_WHOLE_SIZE, 0, (void **)&mapped));
+
 
 		// Font texture
 		VkImageCreateInfo imageInfo = vkTools::initializers::imageCreateInfo();
@@ -536,7 +541,7 @@ public:
 	// Map buffer 
 	void beginTextUpdate()
 	{
-		VK_CHECK_RESULT(vkMapMemory(device, memory, 0, VK_WHOLE_SIZE, 0, (void **)&mapped));
+		mappedLocal = mapped;
 		numLetters = 0;
 	}
 
@@ -579,29 +584,29 @@ public:
 		{
 			stb_fontchar *charData = &stbFontData[(uint32_t)letter - STB_FIRST_CHAR];
 
-			mapped->x = (x + (float)charData->x0 * charW);
-			mapped->y = (y + (float)charData->y0 * charH);
-			mapped->z = charData->s0;
-			mapped->w = charData->t0;
-			mapped++;
+			mappedLocal->x = (x + (float)charData->x0 * charW);
+			mappedLocal->y = (y + (float)charData->y0 * charH);
+			mappedLocal->z = charData->s0;
+			mappedLocal->w = charData->t0;
+			mappedLocal++;
 
-			mapped->x = (x + (float)charData->x1 * charW);
-			mapped->y = (y + (float)charData->y0 * charH);
-			mapped->z = charData->s1;
-			mapped->w = charData->t0;
-			mapped++;
+			mappedLocal->x = (x + (float)charData->x1 * charW);
+			mappedLocal->y = (y + (float)charData->y0 * charH);
+			mappedLocal->z = charData->s1;
+			mappedLocal->w = charData->t0;
+			mappedLocal++;
 
-			mapped->x = (x + (float)charData->x0 * charW);
-			mapped->y = (y + (float)charData->y1 * charH);
-			mapped->z = charData->s0;
-			mapped->w = charData->t1;
-			mapped++;
+			mappedLocal->x = (x + (float)charData->x0 * charW);
+			mappedLocal->y = (y + (float)charData->y1 * charH);
+			mappedLocal->z = charData->s0;
+			mappedLocal->w = charData->t1;
+			mappedLocal++;
 
-			mapped->x = (x + (float)charData->x1 * charW);
-			mapped->y = (y + (float)charData->y1 * charH);
-			mapped->z = charData->s1;
-			mapped->w = charData->t1;
-			mapped++;
+			mappedLocal->x = (x + (float)charData->x1 * charW);
+			mappedLocal->y = (y + (float)charData->y1 * charH);
+			mappedLocal->z = charData->s1;
+			mappedLocal->w = charData->t1;
+			mappedLocal++;
 
 			x += charData->advance * charW;
 
@@ -612,8 +617,6 @@ public:
 	// Unmap buffer and update command buffers
 	void endTextUpdate()
 	{
-		vkUnmapMemory(device, memory);
-		mapped = nullptr;
 		updateCommandBuffers();
 	}
 
@@ -689,13 +692,13 @@ public:
 
 	void reallocateCommandBuffers()
 	{
-		vkFreeCommandBuffers(device, commandPool, (uint32_t)cmdBuffers.size(), cmdBuffers.data());
+		vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(cmdBuffers.size()), cmdBuffers.data());
 
 		VkCommandBufferAllocateInfo cmdBufAllocateInfo =
 			vkTools::initializers::commandBufferAllocateInfo(
 				commandPool,
 				VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-				(uint32_t)cmdBuffers.size());
+				static_cast<uint32_t>(cmdBuffers.size()));
 
 		VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, cmdBuffers.data()));
 	}
