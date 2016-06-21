@@ -42,7 +42,7 @@ private:
 		vkTools::VulkanTexture terrainArray;
 	} textures;
 public:
-	bool wireframe = true;
+	bool wireframe = false;
 	bool tessellation = true;
 
 	struct {
@@ -103,12 +103,11 @@ public:
 	{
 		enableTextOverlay = true;
 		title = "Vulkan Example - Dynamic terrain tessellation";
-		camera.type = Camera::CameraType::firtsperson;
+		camera.type = Camera::CameraType::firstperson;
 		camera.setPerspective(60.0f, (float)width / (float)height, 0.1f, 512.0f);
 		camera.setRotation(glm::vec3(-22.0f, 135.0f, 0.6f));
 		camera.setTranslation(glm::vec3(0.0f, 30.0f, 0.0f));
-//		camera.setTranslation(glm::vec3(36.5f, 13.25f, 36.2f));
-		camera.movementSpeed = 10.0f;
+		camera.movementSpeed = 7.5f;
 		timerSpeed *= 15.0f;
 		// Support for tessellation shaders is optional, so check first
 		//if (!deviceFeatures.tessellationShader)
@@ -786,13 +785,14 @@ public:
 		case GAMEPAD_BUTTON_L1:
 			changeTessellationFactor(-0.05f);
 			break;
-		case 0x20:
-		case GAMEPAD_BUTTON_X:
+		case 0x46:
+		case GAMEPAD_BUTTON_A:
 			toggleWireframe();
 			break;
-		//case VK_RETURN:
-		//	toggleTessellation();
-		//	break;
+		case 0x54:
+		case GAMEPAD_BUTTON_X:
+			toggleTessellation();
+			break;
 		}
 	}
 
@@ -803,12 +803,12 @@ public:
 
 #if defined(__ANDROID__)
 		textOverlay->addText("Tessellation factor: " + ss.str() + " (Buttons L1/R1)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-//		textOverlay->addText("Press \"Button A\" to toggle displacement", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-//		textOverlay->addText("Press \"Button X\" to toggle splitscreen", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay->addText("Press \"Button A\" to toggle wireframe", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay->addText("Press \"Button X\" to toggle tessellation", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #else
 		textOverlay->addText("Tessellation factor: " + ss.str() + " (numpad +/-)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		//textOverlay->addText("Press \"d\" to toggle displacement", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		//textOverlay->addText("Press \"s\" to toggle splitscreen", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay->addText("Press \"f\" to toggle wireframe", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay->addText("Press \"t\" to toggle tessellation", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

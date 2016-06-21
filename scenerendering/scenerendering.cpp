@@ -601,7 +601,7 @@ public:
 	{
 		rotationSpeed = 0.5f;
 		enableTextOverlay = true;
-		camera.type = Camera::CameraType::firtsperson;
+		camera.type = Camera::CameraType::firstperson;
 		camera.movementSpeed = 7.5f;
 		camera.position = { 15.0f, -13.5f, 0.0f };
 		camera.setRotation(glm::vec3(5.0f, 90.0f, 0.0f));
@@ -904,16 +904,16 @@ public:
 #if defined(__ANDROID__)
 		textOverlay->addText("Press \"Button A\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-//		textOverlay->addText("Press \"w\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-#endif
+		textOverlay->addText("Press \"w\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 		if ((scene) && (scene->renderSingleScenePart))
 		{
-			textOverlay->addText("Rendering mesh " + std::to_string(scene->scenePartIndex + 1) + " of " + std::to_string(static_cast<uint32_t>(scene->meshes.size())) + "(\"p\" to toggle)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay->addText("Rendering mesh " + std::to_string(scene->scenePartIndex + 1) + " of " + std::to_string(static_cast<uint32_t>(scene->meshes.size())) + "(\"p\" to toggle)", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 		}
 		else
 		{
-			textOverlay->addText("Rendering whole scene (\"p\" to toggle)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay->addText("Rendering whole scene (\"p\" to toggle)", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 		}
+#endif
 	}
 };
 
