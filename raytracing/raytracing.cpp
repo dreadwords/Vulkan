@@ -128,7 +128,7 @@ public:
 		imageCreateInfo.arrayLayers = 1;
 		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
+		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		// Image will be sampled in the fragment shader and used as storage target in the compute shader
 		imageCreateInfo.usage = 
 			VK_IMAGE_USAGE_SAMPLED_BIT | 
@@ -145,12 +145,17 @@ public:
 		VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &tex->deviceMemory));
 		VK_CHECK_RESULT(vkBindImageMemory(device, tex->image, tex->deviceMemory, 0));
 
-		tex->imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		VkCommandBuffer layoutCmd = VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+
+		tex->imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 		vkTools::setImageLayout(
-			setupCmdBuffer, tex->image, 
+			layoutCmd, 
+			tex->image,
 			VK_IMAGE_ASPECT_COLOR_BIT, 
-			VK_IMAGE_LAYOUT_PREINITIALIZED,
+			VK_IMAGE_LAYOUT_UNDEFINED,
 			tex->imageLayout);
+
+		VulkanExampleBase::flushCommandBuffer(layoutCmd, queue, true);
 
 		// Create sampler
 		VkSamplerCreateInfo sampler = vkTools::initializers::samplerCreateInfo();
@@ -274,44 +279,6 @@ public:
 		vkCmdDispatch(computeCmdBuffer, textureComputeTarget.width / 16, textureComputeTarget.height / 16, 1);
 
 		vkEndCommandBuffer(computeCmdBuffer);
-	}
-
-	void draw()
-	{
-		VkResult err;
-
-		// Get next image in the swap chain (back/front buffer)
-		err = swapChain.acquireNextImage(semaphores.presentComplete, &currentBuffer);
-		assert(!err);
-
-		submitPostPresentBarrier(swapChain.buffers[currentBuffer].image);
-
-		// Command buffer to be sumitted to the queue
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
-
-		// Submit to queue
-		err = vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
-		assert(!err);
-
-		submitPrePresentBarrier(swapChain.buffers[currentBuffer].image);
-
-		err = swapChain.queuePresent(queue, currentBuffer, semaphores.renderComplete);
-		assert(!err);
-
-		err = vkQueueWaitIdle(queue);
-		assert(!err);
-
-		// Compute
-		VkSubmitInfo computeSubmitInfo = vkTools::initializers::submitInfo();
-		computeSubmitInfo.commandBufferCount = 1;
-		computeSubmitInfo.pCommandBuffers = &computeCmdBuffer;
-
-		err = vkQueueSubmit(computeQueue, 1, &computeSubmitInfo, VK_NULL_HANDLE);
-		assert(!err);
-
-		err = vkQueueWaitIdle(computeQueue);
-		assert(!err);
 	}
 
 	// Setup vertices for a single uv-mapped quad
@@ -690,6 +657,28 @@ public:
 		queueCreateInfo.queueFamilyIndex = queueIndex;
 		queueCreateInfo.queueCount = 1;
 		vkGetDeviceQueue(device, queueIndex, 0, &computeQueue);
+	}
+
+	void draw()
+	{
+		VulkanExampleBase::prepareFrame();
+
+		// Command buffer to be sumitted to the queue
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+
+		// Submit to queue
+		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+
+		VulkanExampleBase::submitFrame();
+
+		// Compute
+		VkSubmitInfo computeSubmitInfo = vkTools::initializers::submitInfo();
+		computeSubmitInfo.commandBufferCount = 1;
+		computeSubmitInfo.pCommandBuffers = &computeCmdBuffer;
+
+		VK_CHECK_RESULT(vkQueueSubmit(computeQueue, 1, &computeSubmitInfo, VK_NULL_HANDLE));
+		VK_CHECK_RESULT(vkQueueWaitIdle(computeQueue));
 	}
 
 	void prepare()
