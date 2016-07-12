@@ -365,11 +365,16 @@ VkBool32 VulkanExampleBase::createBuffer(VkBufferUsageFlags usage, VkMemoryPrope
 	}
 }
 
-void VulkanExampleBase::loadMesh(
-	std::string filename,
-	vkMeshLoader::MeshBuffer * meshBuffer,
-	std::vector<vkMeshLoader::VertexLayout> vertexLayout,
-	float scale)
+void VulkanExampleBase::loadMesh(std::string filename, vkMeshLoader::MeshBuffer * meshBuffer, std::vector<vkMeshLoader::VertexLayout> vertexLayout, float scale)
+{
+	vkMeshLoader::MeshCreateInfo meshCreateInfo;
+	meshCreateInfo.scale = glm::vec3(scale);
+	meshCreateInfo.center = glm::vec3(0.0f);
+	meshCreateInfo.uvscale = glm::vec2(1.0f);
+	loadMesh(filename, meshBuffer, vertexLayout, &meshCreateInfo);
+}
+
+void VulkanExampleBase::loadMesh(std::string filename, vkMeshLoader::MeshBuffer * meshBuffer, std::vector<vkMeshLoader::VertexLayout> vertexLayout, vkMeshLoader::MeshCreateInfo *meshCreateInfo)
 {
 	VulkanMeshLoader *mesh = new VulkanMeshLoader();
 
@@ -387,7 +392,7 @@ void VulkanExampleBase::loadMesh(
 		deviceMemoryProperties,
 		meshBuffer,
 		vertexLayout,
-		scale,
+		meshCreateInfo,
 		true,
 		copyCmd,
 		queue);
@@ -1153,7 +1158,7 @@ LRESULT VulkanExampleBase::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			int32_t posy = HIWORD(lParam);
 			rotation.x += (mousePos.y - (float)posy) * 1.25f * rotationSpeed;
 			rotation.y -= (mousePos.x - (float)posx) * 1.25f * rotationSpeed;
-			camera.rotate(glm::vec3((mousePos.y - (float)posy), -(mousePos.x - (float)posx), 0.0f));
+			camera.rotate(glm::vec3((mousePos.y - (float)posy) * camera.rotationSpeed, -(mousePos.x - (float)posx) * camera.rotationSpeed, 0.0f));
 			mousePos = glm::vec2((float)posx, (float)posy);
 			viewChanged();
 		}

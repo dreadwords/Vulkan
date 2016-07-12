@@ -337,10 +337,16 @@ public:
 
 	// Load a mesh (using ASSIMP) and create vulkan vertex and index buffers with given vertex layout
 	void loadMesh(
-		std::string fiename,
-		vkMeshLoader::MeshBuffer *meshBuffer,
-		std::vector<vkMeshLoader::VertexLayout> vertexLayout,
+		std::string fiename, 
+		vkMeshLoader::MeshBuffer *meshBuffer, 
+		std::vector<vkMeshLoader::VertexLayout> vertexLayout, 
 		float scale);
+	void loadMesh(
+		std::string filename, 
+		vkMeshLoader::MeshBuffer *meshBuffer, 
+		std::vector<vkMeshLoader::VertexLayout> 
+		vertexLayout, 
+		vkMeshLoader::MeshCreateInfo *meshCreateInfo);
 
 	// Start the main render loop
 	void renderLoop();
@@ -370,6 +376,7 @@ public:
 
 };
 
+//<<<<<<< HEAD
 extern "C"
 {
 	int32_t createVulkanExample(VulkanExampleBase** vulkanExample);
@@ -394,6 +401,7 @@ extern "C"
 			delete(oldVulkanExample);										\
 		return 0;															\
 	};
+
 //=======
 //// OS specific macros for the example main entry points
 //#if defined(_WIN32)
@@ -445,6 +453,7 @@ extern "C"
 //	{																								\
 //		vulkanExample->handleEvent(event);															\
 //	}																								\
+//}																									\
 //int main(const int argc, const char *argv[])													    \
 //{																									\
 //	vulkanExample = new VulkanExample();															\
@@ -455,5 +464,4 @@ extern "C"
 //	delete(vulkanExample);																			\
 //	return 0;																						\
 //}
-//#endif
-//>>>>>>> aa1fb5eb95b1583822c84e61657d795c1912f3c6
+//>>>>>>> 876f5714eb0925c1f0ebe1e9fe29cbe0e5b78234
