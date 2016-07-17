@@ -168,7 +168,9 @@
     <ClInclude Include="threadpool.hpp" />
     <ClInclude Include="vulkanandroid.h" />
     <ClInclude Include="vulkandebug.h" />
+    <ClInclude Include="vulkandevice.hpp" />
     <ClInclude Include="vulkanexamplebase.h" />
+    <ClInclude Include="vulkanframebuffer.hpp" />
     <ClInclude Include="vulkanMeshLoader.hpp" />
     <ClInclude Include="vulkanswapchain.hpp" />
     <ClInclude Include="vulkantextoverlay.hpp" />
