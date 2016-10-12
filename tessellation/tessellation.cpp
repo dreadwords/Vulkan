@@ -533,19 +533,19 @@ public:
 	{
 		switch (keyCode)
 		{
-		case 0x6B:
+		case KEY_KPADD:
 		case GAMEPAD_BUTTON_R1:
 			changeTessellationLevel(0.25);
 			break;
-		case 0x6D:
+		case KEY_KPSUB:
 		case GAMEPAD_BUTTON_L1:
 			changeTessellationLevel(-0.25);
 			break;
-		case 0x57:
+		case KEY_W:
 		case GAMEPAD_BUTTON_A:
 			togglePipelines();
 			break;
-		case 0x53:
+		case KEY_S:
 		case GAMEPAD_BUTTON_X:
 			toggleSplitScreen();
 			break;
@@ -558,8 +558,10 @@ public:
 		ss << std::setprecision(2) << std::fixed << uboTC.tessLevel;
 #if defined(__ANDROID__)
 		textOverlay->addText("Tessellation level: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay->addText("Press \"Button X\" to toggle splitscreen", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 #else
 		textOverlay->addText("Tessellation level: " + ss.str() + " (NUMPAD +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay->addText("Press \"s\" to toggle splitscreen", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 
@@ -595,5 +597,6 @@ public:
 	}
 
 };
+
 
 DEFINE_VULKAN_APPLICATION_MANAGEMENT_FUNCTIONS();

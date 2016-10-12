@@ -33,6 +33,7 @@
 
 #include "vulkan/vulkan.h"
 
+#include "keycodes.hpp"
 #include "vulkantools.h"
 #include "vulkandebug.h"
 
@@ -43,14 +44,6 @@
 #include "vulkantextoverlay.hpp"
 #include "camera.hpp"
 
-#define GAMEPAD_BUTTON_A 0x1000
-#define GAMEPAD_BUTTON_B 0x1001
-#define GAMEPAD_BUTTON_X 0x1002
-#define GAMEPAD_BUTTON_Y 0x1003
-#define GAMEPAD_BUTTON_L1 0x1004
-#define GAMEPAD_BUTTON_R1 0x1005
-#define GAMEPAD_BUTTON_START 0x1006
-
 // Function pointer for getting physical device fetures to be enabled
 typedef VkPhysicalDeviceFeatures (*PFN_GetEnabledFeatures)();
 
@@ -59,8 +52,6 @@ class VulkanExampleBase
 private:	
 	// Set to true when example is created with enabled validation layers
 	bool enableValidation = false;
-	// Set to true when the debug marker extension is detected
-	bool enableDebugMarkers = false;
 	// Set to true if v-sync will be forced for the swapchain
 	bool enableVSync = false;
 	// Device features enabled by the example
@@ -72,6 +63,8 @@ private:
 	VkResult createInstance(bool enableValidation);
 	// Get window title with example name, device, et.
 	std::string getWindowTitle();
+	/** brief Indicates that the view (position, rotation) has changed and */
+	bool viewUpdated = false;
 	// Destination dimensions for resizing the window
 	uint32_t destWidth;
 	uint32_t destHeight;
@@ -97,7 +90,7 @@ protected:
 	// todo: getter? should always point to VulkanDevice->device
 	VkDevice device;
 	/** @brief Encapsulated physical and logical vulkan device */
-	vk::VulkanDevice vulkanDevice;
+	vk::VulkanDevice *vulkanDevice;
 	// Handle to the device graphics queue that command buffers are submitted to
 	VkQueue queue;
 	// Color buffer format
@@ -109,12 +102,8 @@ protected:
 	VkCommandPool cmdPool;
 	// Command buffer used for setup
 	VkCommandBuffer setupCmdBuffer = VK_NULL_HANDLE;
-	// Command buffer for submitting a post present image barrier
-	std::vector<VkCommandBuffer> postPresentCmdBuffers = { VK_NULL_HANDLE };
-	// Command buffers for submitting a pre present image barrier
-	std::vector<VkCommandBuffer> prePresentCmdBuffers = { VK_NULL_HANDLE };
-	// Pipeline stage flags for the submit info structure
-	VkPipelineStageFlags submitPipelineStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+	/** @brief Pipeline stages used to wait at for graphics queue submissions */
+	VkPipelineStageFlags submitPipelineStages = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 	// Contains command buffers and semaphores to be presented to the queue
 	VkSubmitInfo submitInfo;
 	// Command buffers used for rendering
@@ -208,7 +197,7 @@ public:
 		bool right = false;
 		bool middle = false;
 	} mouseButtons;
-	bool quit;
+	bool quit = false;
 	xcb_connection_t *connection;
 	xcb_screen_t *screen;
 	xcb_window_t window;
@@ -252,13 +241,6 @@ public:
 	// Called in case of an event where e.g. the framebuffer has to be rebuild and thus
 	// all command buffers that may reference this
 	virtual void buildCommandBuffers();
-
-	// Builds the command buffers used to submit the present barriers
-	void buildPresentCommandBuffers();
-
-	// Get memory type for a given memory allocation (flags and bits)
-	VkBool32 getMemoryType(uint32_t typeBits, VkFlags properties, uint32_t *typeIndex);
-	uint32_t getMemoryType(uint32_t typeBits, VkFlags properties);
 
 	// Creates a new (graphics) command pool object storing command buffers
 	void createCommandPool();
@@ -353,12 +335,6 @@ public:
 	// Start the main render loop
 	void renderLoop();
 
-	// Prepare a submit info structure containing
-	// semaphores and submit buffer info for vkQueueSubmit
-	VkSubmitInfo prepareSubmitInfo(
-		std::vector<VkCommandBuffer> commandBuffers,
-		VkPipelineStageFlags *pipelineStages);
-
 	void updateTextOverlay();
 
 	// Called when the text overlay is updating
@@ -367,13 +343,11 @@ public:
 
 	// Prepare the frame for workload submission
 	// - Acquires the next image from the swap chain 
-	// - Submits a post present barrier
 	// - Sets the default wait and signal semaphores
 	void prepareFrame();
 
 	// Submit the frames' workload 
 	// - Submits the text overlay (if enabled)
-	// - 
 	void submitFrame();
 
 };

@@ -175,7 +175,7 @@ public:
 	// The other example will use the VulkanMesh loader which has some additional functionality for loading meshes
 	void loadMesh()
 	{
-		VulkanMeshLoader *meshLoader = new VulkanMeshLoader(&vulkanDevice);
+		VulkanMeshLoader *meshLoader = new VulkanMeshLoader(vulkanDevice);
 #if defined(__ANDROID__)
 		meshLoader->assetManager = androidApp->activity->assetManager;
 #endif
@@ -613,7 +613,7 @@ public:
 	{
 		switch (keyCode)
 		{
-		case 0x57:
+		case KEY_W:
 		case GAMEPAD_BUTTON_A:
 			wireframe = !wireframe;
 			reBuildCommandBuffers();

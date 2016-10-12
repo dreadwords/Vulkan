@@ -635,14 +635,14 @@ VkDescriptorPoolSize vkTools::initializers::descriptorPoolSize(
 VkDescriptorSetLayoutBinding vkTools::initializers::descriptorSetLayoutBinding(
 	VkDescriptorType type, 
 	VkShaderStageFlags stageFlags, 
-	uint32_t binding)
+	uint32_t binding,
+	uint32_t count)
 {
 	VkDescriptorSetLayoutBinding setLayoutBinding = {};
 	setLayoutBinding.descriptorType = type;
 	setLayoutBinding.stageFlags = stageFlags;
 	setLayoutBinding.binding = binding;
-	// Default value in all examples
-	setLayoutBinding.descriptorCount = 1; 
+	setLayoutBinding.descriptorCount = count; 
 	return setLayoutBinding;
 }
 
@@ -788,7 +788,7 @@ VkPipelineRasterizationStateCreateInfo vkTools::initializers::pipelineRasterizat
 	pipelineRasterizationStateCreateInfo.cullMode = cullMode;
 	pipelineRasterizationStateCreateInfo.frontFace = frontFace;
 	pipelineRasterizationStateCreateInfo.flags = flags;
-	pipelineRasterizationStateCreateInfo.depthClampEnable = VK_TRUE;
+	pipelineRasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
 	pipelineRasterizationStateCreateInfo.lineWidth = 1.0f;
 	return pipelineRasterizationStateCreateInfo;
 }
@@ -906,4 +906,11 @@ VkPushConstantRange vkTools::initializers::pushConstantRange(
 	pushConstantRange.offset = offset;
 	pushConstantRange.size = size;
 	return pushConstantRange;
+}
+
+VkBindSparseInfo vkTools::initializers::bindSparseInfo()
+{
+	VkBindSparseInfo bindSparseInfo{};
+	bindSparseInfo.sType = VK_STRUCTURE_TYPE_BIND_SPARSE_INFO;
+	return VkBindSparseInfo();
 }

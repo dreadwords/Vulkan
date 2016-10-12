@@ -84,7 +84,7 @@ namespace vk
 	};
 
 	/**
-	* @brief Encaspulates a complete Vulkan framebuffer with an arbitrary number and combination of attachments
+	* @brief Encapsulates a complete Vulkan framebuffer with an arbitrary number and combination of attachments
 	*/
 	struct Framebuffer
 	{
@@ -116,24 +116,23 @@ namespace vk
 			assert(vulkanDevice);
 			for (auto attachment : attachments)
 			{
-				vkDestroyImage(vulkanDevice->device, attachment.image, nullptr);
-				vkDestroyImageView(vulkanDevice->device, attachment.view, nullptr);
-				vkFreeMemory(vulkanDevice->device, attachment.memory, nullptr);
+				vkDestroyImage(vulkanDevice->logicalDevice, attachment.image, nullptr);
+				vkDestroyImageView(vulkanDevice->logicalDevice, attachment.view, nullptr);
+				vkFreeMemory(vulkanDevice->logicalDevice, attachment.memory, nullptr);
 			}
-			vkDestroySampler(vulkanDevice->device, sampler, nullptr);
-			vkDestroyRenderPass(vulkanDevice->device, renderPass, nullptr);
-			vkDestroyFramebuffer(vulkanDevice->device, framebuffer, nullptr);
+			vkDestroySampler(vulkanDevice->logicalDevice, sampler, nullptr);
+			vkDestroyRenderPass(vulkanDevice->logicalDevice, renderPass, nullptr);
+			vkDestroyFramebuffer(vulkanDevice->logicalDevice, framebuffer, nullptr);
 		}
 
 		/**
 		* Add a new attachment described by createinfo to the framebuffer's attachment list
 		*
 		* @param createinfo Structure that specifices the framebuffer to be constructed
-		* @param layoutCmd A valid and active command buffer used for the initial layout transitions
 		*
 		* @return Index of the new attachment
 		*/
-		uint32_t addAttachment(vk::AttachmentCreateInfo createinfo, VkCommandBuffer layoutCmd)
+		uint32_t addAttachment(vk::AttachmentCreateInfo createinfo)
 		{
 			vk::FramebufferAttachment attachment;
 
@@ -185,27 +184,17 @@ namespace vk
 			VkMemoryRequirements memReqs;
 
 			// Create image for this attachment
-			VK_CHECK_RESULT(vkCreateImage(vulkanDevice->device, &image, nullptr, &attachment.image));
-			vkGetImageMemoryRequirements(vulkanDevice->device, attachment.image, &memReqs);
+			VK_CHECK_RESULT(vkCreateImage(vulkanDevice->logicalDevice, &image, nullptr, &attachment.image));
+			vkGetImageMemoryRequirements(vulkanDevice->logicalDevice, attachment.image, &memReqs);
 			memAlloc.allocationSize = memReqs.size;
 			memAlloc.memoryTypeIndex = vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-			VK_CHECK_RESULT(vkAllocateMemory(vulkanDevice->device, &memAlloc, nullptr, &attachment.memory));
-			VK_CHECK_RESULT(vkBindImageMemory(vulkanDevice->device, attachment.image, attachment.memory, 0));
+			VK_CHECK_RESULT(vkAllocateMemory(vulkanDevice->logicalDevice, &memAlloc, nullptr, &attachment.memory));
+			VK_CHECK_RESULT(vkBindImageMemory(vulkanDevice->logicalDevice, attachment.image, attachment.memory, 0));
 
 			attachment.subresourceRange = {};
 			attachment.subresourceRange.aspectMask = aspectMask;
 			attachment.subresourceRange.levelCount = 1;
 			attachment.subresourceRange.layerCount = createinfo.layerCount;
-
-			// Set the initial layout to shader read instead of attachment 
-			// Note that the render loop has to take care of the transition from read to attachment
-			vkTools::setImageLayout(
-				layoutCmd,
-				attachment.image,
-				aspectMask,
-				VK_IMAGE_LAYOUT_UNDEFINED,
-				imageLayout,
-				attachment.subresourceRange);
 
 			VkImageViewCreateInfo imageView = vkTools::initializers::imageViewCreateInfo();
 			imageView.viewType = (createinfo.layerCount == 1) ? VK_IMAGE_VIEW_TYPE_2D : VK_IMAGE_VIEW_TYPE_2D_ARRAY;
@@ -214,7 +203,7 @@ namespace vk
 			//todo: workaround for depth+stencil attachments
 			imageView.subresourceRange.aspectMask = (attachment.hasDepth()) ? VK_IMAGE_ASPECT_DEPTH_BIT : aspectMask;
 			imageView.image = attachment.image;
-			VK_CHECK_RESULT(vkCreateImageView(vulkanDevice->device, &imageView, nullptr, &attachment.view));
+			VK_CHECK_RESULT(vkCreateImageView(vulkanDevice->logicalDevice, &imageView, nullptr, &attachment.view));
 
 			// Fill attachment description
 			attachment.description = {};
@@ -224,14 +213,15 @@ namespace vk
 			attachment.description.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachment.description.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 			attachment.description.format = createinfo.format;
+			attachment.description.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			// Final layout
+			// If not, final layout depends on attachment type
 			if (attachment.hasDepth() || attachment.hasStencil())
 			{
-				attachment.description.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 				attachment.description.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 			}
 			else
 			{
-				attachment.description.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 				attachment.description.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			}
 
@@ -264,7 +254,7 @@ namespace vk
 			samplerInfo.minLod = 0.0f;
 			samplerInfo.maxLod = 1.0f;
 			samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-			return vkCreateSampler(vulkanDevice->device, &samplerInfo, nullptr, &sampler);
+			return vkCreateSampler(vulkanDevice->logicalDevice, &samplerInfo, nullptr, &sampler);
 		}
 
 		/**
@@ -319,6 +309,25 @@ namespace vk
 				subpass.pDepthStencilAttachment = &depthReference;
 			}
 
+			// Use subpass dependencies for attachment layout transitions
+			std::array<VkSubpassDependency, 2> dependencies;
+
+			dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+			dependencies[0].dstSubpass = 0;
+			dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+			dependencies[1].srcSubpass = 0;
+			dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+			dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
 			// Create render pass
 			VkRenderPassCreateInfo renderPassInfo = {};
 			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -326,7 +335,9 @@ namespace vk
 			renderPassInfo.attachmentCount = static_cast<uint32_t>(attachmentDescriptions.size());
 			renderPassInfo.subpassCount = 1;
 			renderPassInfo.pSubpasses = &subpass;
-			VK_CHECK_RESULT(vkCreateRenderPass(vulkanDevice->device, &renderPassInfo, nullptr, &renderPass));
+			renderPassInfo.dependencyCount = 2;
+			renderPassInfo.pDependencies = dependencies.data();
+			VK_CHECK_RESULT(vkCreateRenderPass(vulkanDevice->logicalDevice, &renderPassInfo, nullptr, &renderPass));
 
 			std::vector<VkImageView> attachmentViews;
 			for (auto attachment : attachments)
@@ -352,7 +363,7 @@ namespace vk
 			framebufferInfo.width = width;
 			framebufferInfo.height = height;
 			framebufferInfo.layers = maxLayers;
-			VK_CHECK_RESULT(vkCreateFramebuffer(vulkanDevice->device, &framebufferInfo, nullptr, &framebuffer));
+			VK_CHECK_RESULT(vkCreateFramebuffer(vulkanDevice->logicalDevice, &framebufferInfo, nullptr, &framebuffer));
 
 			return VK_SUCCESS;
 		}

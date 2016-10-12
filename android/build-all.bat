@@ -1,6 +1,7 @@
 call _build geometryshader %1
 call _build computeparticles %1
 call _build computeshader %1
+call _build computecullandlod %1
 call _build parallaxmapping %1
 call _build bloom %1
 call _build gears %1
@@ -32,3 +33,7 @@ call _build textoverlay %1
 call _build debugmarker %1
 call _build scenerendering %1
 call _build terraintessellation %1
+call _build deferredshadows %1
+call _build indirectdraw %1
+call _build texturemipmapgen %1
+call _build texture3d %1

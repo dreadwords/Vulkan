@@ -22,6 +22,12 @@
       <Project>{3977789c-b360-4e1b-a100-3d71a1567723}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shaders\multithreading\phong.frag" />
+    <None Include="..\data\shaders\multithreading\phong.vert" />
+    <None Include="..\data\shaders\multithreading\starsphere.frag" />
+    <None Include="..\data\shaders\multithreading\starsphere.vert" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F5703C3C-F495-4D5C-BAA5-A90C4E20C7B7}</ProjectGuid>
     <RootNamespace>mesh</RootNamespace>

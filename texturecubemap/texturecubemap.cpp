@@ -80,7 +80,7 @@ public:
 	{
 		zoom = -4.0f;
 		rotationSpeed = 0.25f;
-		rotation = { -7.25f, 120.0f, 0.0f };
+		rotation = { -7.25f, -120.0f, 0.0f };
 		enableTextOverlay = true;
 		title = "Vulkan Example - Cube map";
 	}
@@ -156,7 +156,7 @@ public:
 		vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
 		memAllocInfo.allocationSize = memReqs.size;
 		// Get memory type index for a host visible buffer
-		memAllocInfo.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		memAllocInfo.memoryTypeIndex = vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingMemory));
 		VK_CHECK_RESULT(vkBindBufferMemory(device, stagingBuffer, stagingMemory, 0));
 
@@ -188,7 +188,7 @@ public:
 		vkGetImageMemoryRequirements(device, cubeMap.image, &memReqs);
 
 		memAllocInfo.allocationSize = memReqs.size;
-		memAllocInfo.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		memAllocInfo.memoryTypeIndex = vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 		VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &cubeMap.deviceMemory));
 		VK_CHECK_RESULT(vkBindImageMemory(device, cubeMap.image, cubeMap.deviceMemory, 0));
@@ -267,11 +267,16 @@ public:
 		sampler.addressModeV = sampler.addressModeU;
 		sampler.addressModeW = sampler.addressModeU;
 		sampler.mipLodBias = 0.0f;
-		sampler.maxAnisotropy = 8.0f;
 		sampler.compareOp = VK_COMPARE_OP_NEVER;
 		sampler.minLod = 0.0f;
 		sampler.maxLod = (float)cubeMap.mipLevels;
 		sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+		sampler.maxAnisotropy = 1.0f;
+		if (vulkanDevice->features.samplerAnisotropy)
+		{
+			sampler.maxAnisotropy = vulkanDevice->properties.limits.maxSamplerAnisotropy;
+			sampler.anisotropyEnable = VK_TRUE;
+		}
 		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &cubeMap.sampler));
 
 		// Create image view
@@ -737,19 +742,19 @@ public:
 	{
 		switch (keyCode)
 		{
-		case 0x53:
+		case KEY_S:
 		case GAMEPAD_BUTTON_A:
 			toggleSkyBox();
 			break;
-		case 0x20:
+		case KEY_SPACE:
 		case GAMEPAD_BUTTON_X:
 			toggleObject();
 			break;
-		case 0x6B:
+		case KEY_KPADD:
 		case GAMEPAD_BUTTON_R1:
 			changeLodBias(0.1f);
 			break;
-		case 0x6D:
+		case KEY_KPSUB:
 		case GAMEPAD_BUTTON_L1:
 			changeLodBias(-0.1f);
 			break;

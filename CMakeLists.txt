@@ -31,9 +31,7 @@ message(STATUS ${VULKAN_LIB})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-add_definitions(-std=c++14)
-add_definitions(-std=c++0x)
-add_definitions(-std=gnu++14)
+add_definitions(-std=c++11)
 
 file(GLOB SOURCE *.cpp base/*.cpp)
 
@@ -53,12 +51,12 @@ endfunction(buildExample)
 function(buildExamples)
 	foreach(EXAMPLE ${EXAMPLES})
 		buildExample(${EXAMPLE})
-    endforeach(EXAMPLE)
+	endforeach(EXAMPLE)
 endfunction(buildExamples)
 
 # Compiler specific stuff
 IF(MSVC)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 ENDIF(MSVC)
 
 IF(WIN32)
@@ -74,13 +72,15 @@ set(EXAMPLES
 	computeshader
 	computeparticles
 	deferred
+	deferredshadows
 	displacement
 	distancefieldfonts
 	gears
 	geometryshader
+	indirectdraw	
 	instancing
 	mesh
-    multithreading
+	multithreading
 	multisampling
 	occlusionquery
 	offscreen
@@ -90,15 +90,19 @@ set(EXAMPLES
 	pushconstants
 	raytracing
 	radialblur
+	scenerendering
 	shadowmapping
 	shadowmappingomni
 	skeletalanimation
 	sphericalenvmapping
+	terraintessellation
 	tessellation
 	textoverlay
 	texture
+	texture3d
 	texturearray
 	texturecubemap
+	texturemipmapgen
 	triangle
 	vulkanscene
 )

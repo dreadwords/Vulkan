@@ -15,7 +15,7 @@ If you're using a different IDE or compiler you can use the provided CMakeLists.
 
 ## <img src="./images/linuxlogo.png" alt="" height="32px"> Linux
 
-Use the provided the provided CMakeLists.txt for use with [CMake](https://cmake.org) to generate a build configuration for your favorite IDE or compiler.
+Use the provided CMakeLists.txt with [CMake](https://cmake.org) to generate a build configuration for your favorite IDE or compiler.
 
 Note that you need [assimp](https://github.com/assimp/assimp) in order to compile the examples for Linux. Either compile and install from the repository, or install libassimp-dev. The examples require at least version 3.2.
 
@@ -23,18 +23,13 @@ Note that you need [assimp](https://github.com/assimp/assimp) in order to compil
 
 Building on Android is done using the [Android NDK](http://developer.android.com/tools/sdk/ndk/index.html) and requires a device that supports Vulkan. Please see the [Android readme](./android/README.md) on how to build and deploy the examples.
 
-## Binaries
+## Precompiled binaries
 
-Precompiled binaries for Windows (x64), Linux (x64) and Android can be [found here](http://vulkan.gpuinfo.org/examples.php). I'll try keep them up-to-date with the repository.
-
-Note that these only contain the binaries, you still need the repository for the data (shaders, models, textures) and put the binaries into to bin subfolder. Except for Android, where all required assets are stored inside of the apk.
+Precompiled binaries for Windows (x64), Linux (x64) and Android can be [found here](http://vulkan.gpuinfo.org/examples.php). Note that these may not always be up-to-date with the repository.
 
 ## Additional documentation
 
 Additional documentation for several base classes and some Presentations can be found [in this directory](./documentation/additionaldocs.md).
-
-### Presentations
-- [From OpenGL to Vulkan (Khronos Meetup Munich, 2016-04-08)](./documentation/Khronos_meetup_munich_fromGLtoVulkan.pdf)
 
 # Examples
 
@@ -46,15 +41,15 @@ Most basic example. Renders a colored triangle using an indexed vertex buffer. V
 This example is far more explicit than the other examples and is meant to be a starting point for learning Vulkan from the ground up. Much of the code is boilerplate that you'd usually encapsulate in helper functions and classes (which is what the other examples do).
 <br><br>
 
-## [Texture mapping](texture/)
+## [(Texture mapping) Basic texture mapping](texture/)
 <img src="./screenshots/basic_texture.png" height="96px" align="right">
 
-Shows how to upload a 2D texture to video memory for sampling in a shader. Loads a compressed texture into a host visible staging buffer and copies all mip levels to a device local optimal tiled image for best performance.
+Shows how to upload a 2D texture into video memory for sampling in a shader. Loads a compressed texture into a host visible staging buffer and copies all mip levels to a device local optimal tiled image for best performance.
 
-Also demonstrates the use of (combined) image samplers. Samplers are detached from the actual texture image and only contain information on how a image is sampled in the shader.
+Also demonstrates the use of combined image samplers. Samplers are detached from the actual texture image and only contain information on how an image is sampled in the shader.
 <br><br>
 
-## [Cubemap texture](texturecubemap/)
+## [(Texture mapping) Cube maps](texturecubemap/)
 <img src="./screenshots/texture_cubemap.jpg" height="96px" align="right">
 
 Building on the basic texture loading example, a cubemap texture is loaded into a staging buffer and is copied over to a device local optimal image using buffer to image copies for all of it's faces and mip maps.
@@ -62,12 +57,19 @@ Building on the basic texture loading example, a cubemap texture is loaded into 
 The demo then uses two different pipelines (and shader sets) to display the cubemap as a skybox (background) and as a source for reflections.
 <br><br>
 
-## [Texture array](texturearray/)
+## [(Texture mapping) Texture arrays](texturearray/)
 <img src="./screenshots/texture_array.png" height="96px" align="right">
 
 Texture arrays allow storing of multiple images in different layers without any interpolation between the layers.
 This example demonstrates the use of a 2D texture array with instanced rendering. Each instance samples from a different layer of the texture array.
 <br><br>
+
+## [(Texture mapping) Run-time mip-map generation](texturemipmapgen/)
+<img src="./screenshots/texture_mipmap_gen.jpg" height="96px" align="right">
+
+Generates a complete mip-chain at runtime (instead of using mip levels stored in texture file) by blitting from one mip level down to the next smaller size until the lower end of the mip chain (1x1 pixels is reached). 
+
+This is done using image blits and proper image memory barriers.     
 
 ## [Text overlay (Multi pass)](textoverlay/)
 <img src="./screenshots/textoverlay.png" height="96px" align="right">
@@ -117,6 +119,13 @@ Also shows how to use multiple descriptor sets simultaneously with the new GLSL 
 
 Shows the use of instancing for rendering many copies of the same mesh using different attributes and textures. A secondary vertex buffer containing instanced data, stored in device local memory, is used to pass instance data to the shader via vertex attributes with a per-instance step rate. The instance data also contains a texture layer index for having different textures for the instanced meshes.
 <br><br>
+
+## [Indirect drawing](indirectdraw/)
+<img src="./screenshots/indirectdraw.jpg" height="96px" align="right">
+
+This example renders thousands of instanced objects with different geometries using only one single indirect draw call (if ```multiDrawIndirect``` is supported). Unlike direct drawing function, indirect drawing functions take their draw commands from a buffer object containing information like index cound, index offset and number of instances to draw.
+
+Shows how to generate and render such an indirect draw command buffer that is staged to the device. Indirect draw buffers are the base for generating and updating draw commands on the GPU using shaders.
 
 ## [Multi sampling](multisampling/)
 <img src="./screenshots/multisampling.png" height="96px" align="right">
@@ -176,6 +185,16 @@ Implements a bloom effect to simulate glowing parts of a 3D mesh. A two pass gau
 Demonstrates the use of multiple render targets to fill a G-Buffer for a deferred shading setup with multiple dynamic lights and normal mapped surfaces.
 
 Deferred shading collects all values (color, normal, position) into different render targets in one pass thanks to multiple render targets, and then does all shading and lighting calculations based on these in screen space, thus allowing for much more light sources than traditional forward renderers.
+<br><br>
+
+## [Deferred shading and shadow mapping](deferredshadows/)
+<img src="./screenshots/deferred_shadows.jpg" height="96px" align="right">
+
+Building on the deferred shading setup this example adds directional shadows using shadow maps from multiple spotlights.
+
+Scene depth from the different light's point-of-view is renderer to a layered depth attachment using only one pass. This is done using multiple geometry shader invocations that allows to output multiple instances of the same geoemtry using different matrices into the layers of the depth attachment.
+
+The final scene compositing pass then samples from the layered depth map to determine if a fragment is shadowed or not.
 <br><br>
 
 ## [Shadow mapping](shadowmapping/)

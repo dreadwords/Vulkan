@@ -178,7 +178,7 @@ public:
 		VK_CHECK_RESULT(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &queryResult.buffer));
 		vkGetBufferMemoryRequirements(device, queryResult.buffer, &memReqs);
 		memAlloc.allocationSize = memReqs.size;
-		memAlloc.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		memAlloc.memoryTypeIndex = vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &queryResult.memory));
 		VK_CHECK_RESULT(vkBindBufferMemory(device, queryResult.buffer, queryResult.memory, 0));
 
@@ -939,19 +939,19 @@ public:
 	{
 		switch (keyCode)
 		{
-		case 0x6B:
+		case KEY_KPADD:
 		case GAMEPAD_BUTTON_R1:
 			changeTessellationFactor(0.05f);
 			break;
-		case 0x6D:
+		case KEY_KPSUB:
 		case GAMEPAD_BUTTON_L1:
 			changeTessellationFactor(-0.05f);
 			break;
-		case 0x46:
+		case KEY_F:
 		case GAMEPAD_BUTTON_A:
 			toggleWireframe();
 			break;
-		case 0x54:
+		case KEY_T:
 		case GAMEPAD_BUTTON_X:
 			toggleTessellation();
 			break;
